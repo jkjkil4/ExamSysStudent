@@ -7,6 +7,9 @@
 class QUdpSocket;
 class QTcpSocket;
 class QDomElement;
+class QStackedLayout;
+
+class LoginView;
 
 /**
  * @brief   窗口控件
@@ -29,4 +32,7 @@ private:
     QUdpSocket *mUdpSocket;
     QTcpSocket *mTcpSocket;
     QHostAddress mAddress;
+    QStackedLayout *mStkLayout;
+
+    LoginView *mLoginView;
 };

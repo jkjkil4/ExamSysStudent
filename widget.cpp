@@ -1,5 +1,7 @@
 #include "widget.h"
 
+#include <QStackedLayout>
+
 #include <QXmlStreamWriter>
 #include <QDomElement>
 
@@ -7,10 +9,21 @@
 #include <QTcpSocket>
 #include <QNetworkInterface>
 
+#include "SubWidget/loginview.h"
+
 Widget::Widget(QWidget *parent)
     : QWidget(parent),
-      mUdpSocket(new QUdpSocket(this)), mTcpSocket(new QTcpSocket(this))
+      mUdpSocket(new QUdpSocket(this)), mTcpSocket(new QTcpSocket(this)),
+      mStkLayout(new QStackedLayout),
+      mLoginView(new LoginView(this))
 {
+    mStkLayout->addWidget(mLoginView);
+    mStkLayout->setCurrentWidget(mLoginView);
+    mStkLayout->setMargin(0);
+    setLayout(mStkLayout);
+    setWindowTitle("考试系统（考生端）");
+    resize(1240, 760);
+
     // 获取本机IP
     QList<QHostAddress> addresses = QNetworkInterface::allAddresses();
     for(const QHostAddress &address : qAsConst(addresses)) {
