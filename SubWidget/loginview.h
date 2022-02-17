@@ -1,5 +1,4 @@
-#ifndef LOGINVIEW_H
-#define LOGINVIEW_H
+#pragma once
 
 #include <QWidget>
 
@@ -15,8 +14,20 @@ public:
     explicit LoginView(QWidget *parent = nullptr);
     ~LoginView();
 
+    void clearServer();
+    void addServer(const QString &address, quint16 port, const QString &name);
+
+signals:
+    void flushServer();
+
 private:
     Ui::LoginView *ui;
-};
 
-#endif // LOGINVIEW_H
+    struct Server
+    {
+        QString address;
+        quint16 port;
+        QString name;
+    };
+    QList<Server> mListServer;
+};

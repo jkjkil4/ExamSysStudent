@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
    <property name="spacing">
     <number>0</number>
    </property>
@@ -74,7 +74,7 @@
        </widget>
       </item>
       <item>
-       <spacer name="horizontalSpacer">
+       <spacer name="horSpacerTitle">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -94,9 +94,15 @@
      <property name="styleSheet">
       <string notr="true">QWidget#centralWidget{
 	background-color: white;
+}
+
+QLabel{
+	border: 2px solid rgb(26, 222, 209);
+	color: #FFFFFF;
+	background-color: rgb(26, 222, 209);
 }</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
+     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1">
       <property name="leftMargin">
        <number>80</number>
       </property>
@@ -110,16 +116,12 @@
        <number>80</number>
       </property>
       <item>
-       <layout class="QHBoxLayout" name="layoutTmp" stretch="0,1">
+       <layout class="QVBoxLayout" name="layoutEdit" stretch="0,0,1">
+        <property name="spacing">
+         <number>12</number>
+        </property>
         <item>
-         <widget class="QGroupBox" name="groupBox">
-          <property name="styleSheet">
-           <string notr="true">QLabel{
-	border: 2px solid rgb(26, 222, 209);
-	color: #FFFFFF;
-	background-color: rgb(26, 222, 209);
-}</string>
-          </property>
+         <widget class="QGroupBox" name="boxStu">
           <property name="title">
            <string>考生信息</string>
           </property>
@@ -134,7 +136,7 @@
             <widget class="QLineEdit" name="editPwd">
              <property name="minimumSize">
               <size>
-               <width>320</width>
+               <width>420</width>
                <height>0</height>
               </size>
              </property>
@@ -164,7 +166,7 @@
             <widget class="QLineEdit" name="editName">
              <property name="minimumSize">
               <size>
-               <width>320</width>
+               <width>420</width>
                <height>0</height>
               </size>
              </property>
@@ -174,14 +176,72 @@
          </widget>
         </item>
         <item>
-         <spacer name="horizontalSpacer_2">
+         <widget class="QGroupBox" name="groupBox">
+          <property name="title">
+           <string>考试信息</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_2">
+           <item>
+            <layout class="QHBoxLayout" name="layoutServer">
+             <property name="spacing">
+              <number>12</number>
+             </property>
+             <item>
+              <layout class="QHBoxLayout" name="layoutCbbServer" stretch="0,1">
+               <property name="spacing">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QLabel" name="labelServer">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string>选择考试</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QComboBox" name="cbbServer">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <item>
+                  <property name="text">
+                   <string>(无)</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btnFlush">
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verSpacerEdit">
           <property name="orientation">
-           <enum>Qt::Horizontal</enum>
+           <enum>Qt::Vertical</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>40</width>
-            <height>20</height>
+            <width>20</width>
+            <height>40</height>
            </size>
           </property>
          </spacer>
@@ -189,14 +249,14 @@
        </layout>
       </item>
       <item>
-       <spacer name="verticalSpacer">
+       <spacer name="horSpacerEdit">
         <property name="orientation">
-         <enum>Qt::Vertical</enum>
+         <enum>Qt::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>20</width>
-          <height>40</height>
+          <width>40</width>
+          <height>20</height>
          </size>
         </property>
        </spacer>

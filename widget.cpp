@@ -38,6 +38,8 @@ Widget::Widget(QWidget *parent)
     mUdpSocket->bind(mAddress, 40565, QUdpSocket::ShareAddress);
     connect(mUdpSocket, &QUdpSocket::readyRead, this, &Widget::onUdpReadyRead);
 
+    connect(mLoginView, &LoginView::flushServer, this, &Widget::udpSendServerSearch);
+
     udpSendServerSearch();
 }
 
@@ -54,14 +56,8 @@ void Widget::udpSendServerSearch() {
     xml.writeCharacters(mAddress.toString());
     xml.writeEndElement();
     xml.writeEndDocument();
+    mLoginView->clearServer();
     mUdpSocket->writeDatagram(array, QHostAddress::Broadcast, 40565);
-}
-
-void Widget::onUdpReadyRead_SearchServerRetval(const QDomElement &elem) {
-    QString address = elem.text();
-    quint16 port = elem.attribute("Port").toUShort();
-    Q_UNUSED(address)
-    Q_UNUSED(port)
 }
 
 void Widget::onUdpReadyRead() {
@@ -81,4 +77,11 @@ void Widget::onUdpReadyRead() {
             onUdpReadyRead_SearchServerRetval(root);
         }
     }
+}
+
+void Widget::onUdpReadyRead_SearchServerRetval(const QDomElement &elem) {
+    QString address = elem.attribute("Address");
+    quint16 port = elem.attribute("Port").toUShort();
+    QString name = elem.text();
+    mLoginView->addServer(address, port, name);
 }

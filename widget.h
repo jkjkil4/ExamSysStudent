@@ -21,12 +21,12 @@ public:
     Widget(QWidget *parent = nullptr);
     ~Widget();
 
-    void udpSendServerSearch();
-
-    void onUdpReadyRead_SearchServerRetval(const QDomElement &elem);
-
 public slots:
+    void udpSendServerSearch();
     void onUdpReadyRead();
+
+public:
+    void onUdpReadyRead_SearchServerRetval(const QDomElement &elem);
 
 private:
     QUdpSocket *mUdpSocket;
