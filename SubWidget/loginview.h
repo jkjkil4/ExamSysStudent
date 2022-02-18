@@ -11,23 +11,56 @@ class LoginView : public QWidget
     Q_OBJECT
 
 public:
-    explicit LoginView(QWidget *parent = nullptr);
-    ~LoginView();
-
-    void clearServer();
-    void addServer(const QString &address, quint16 port, const QString &name);
-
-signals:
-    void flushServer();
-
-private:
-    Ui::LoginView *ui;
-
     struct Server
     {
         QString address;
         quint16 port;
         QString name;
     };
+
+    explicit LoginView(QWidget *parent = nullptr);
+    ~LoginView();
+
+    /**
+     * @brief   设置进入按钮是否可用
+     * @param   enabled     是否可用
+     */
+    void setBtnEnabled(bool enabled);
+
+    /**
+     * @brief   清空服务端
+     */
+    void clearServer();
+    /**
+     * @brief   添加服务端
+     * @param   address   服务端地址
+     * @param   port      服务端端口
+     * @param   name      服务端名称
+     */
+    void addServer(const QString &address, quint16 port, const QString &name);
+
+    /**
+     * @brief   得到考生名
+     * @return  考生名
+     */
+    QString stuName();
+    /**
+     * @brief   得到考生密码
+     * @return  考生密码
+     */
+    QString stuPwd();
+    /**
+     * @brief   当前选中的服务端
+     * @return  服务端数据指针，若为nullptr表示没有选中
+     */
+    const Server* currentServer();
+
+signals:
+    void flushServer();
+    void connectServer();
+
+private:
+    Ui::LoginView *ui;
+
     QList<Server> mListServer;
 };

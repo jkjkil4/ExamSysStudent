@@ -116,9 +116,9 @@ QLabel{
        <number>80</number>
       </property>
       <item>
-       <layout class="QVBoxLayout" name="layoutEdit" stretch="0,0,1">
+       <layout class="QVBoxLayout" name="layoutEdit" stretch="0,0,0,1">
         <property name="spacing">
-         <number>12</number>
+         <number>16</number>
         </property>
         <item>
          <widget class="QGroupBox" name="boxStu">
@@ -212,11 +212,6 @@ QLabel{
                    <verstretch>0</verstretch>
                   </sizepolicy>
                  </property>
-                 <item>
-                  <property name="text">
-                   <string>(无)</string>
-                  </property>
-                 </item>
                 </widget>
                </item>
               </layout>
@@ -231,6 +226,26 @@ QLabel{
             </layout>
            </item>
           </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnConnect">
+          <property name="styleSheet">
+           <string notr="true">QPushButton{
+	color: #FFFFFF;
+	border: 2px solid rgb(24, 204, 192);
+	background-color: rgb(20,196,188);
+}
+QPushButton:hover{
+	background-color: rgb(22,218,208);
+}
+QPushButton:pressed{
+	background-color: rgb(17,171,164);
+}</string>
+          </property>
+          <property name="text">
+           <string>加入考试</string>
+          </property>
          </widget>
         </item>
         <item>
