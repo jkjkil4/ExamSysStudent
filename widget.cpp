@@ -50,10 +50,10 @@ Widget::Widget(QWidget *parent)
     connect(mTcpSocket, &QTcpSocket::readyRead, this, &Widget::onTcpReadyRead);
     connect(mTcpSocket, QOverload<QAbstractSocket::SocketError>::of(&QTcpSocket::error), this, &Widget::onTcpError);
 
-    connect(mLoginView, &LoginView::flushServer, this, &Widget::udpSendServerSearch);
+    connect(mLoginView, &LoginView::flushServer, this, &Widget::udpSendSearchServer);
     connect(mLoginView, &LoginView::connectServer, this, &Widget::onConnectServer);
 
-    udpSendServerSearch();
+    udpSendSearchServer();
 }
 
 Widget::~Widget()
@@ -67,7 +67,7 @@ bool Widget::parseUdpDatagram(const QByteArray &array) {
     if(!doc.setContent(array))
         return false;
     QDomElement root = doc.documentElement();
-    if(root.tagName() != "ESDatagram")
+    if(root.tagName() != "ESDtg")
         return false;
 
     QString type = root.attribute("Type");
@@ -88,13 +88,28 @@ bool Widget::parseTcpDatagram(const QByteArray &array) {
     if(!doc.setContent(array))
         return false;
     QDomElement root = doc.documentElement();
-    if(root.tagName() != "ESDatagram")
+    if(root.tagName() != "ESDtg")
         return false;
 
     QString type = root.attribute("Type");
     if(type == "VerifySucc") {
-        if(mStkLayout->currentWidget() == mLoginView)
+        if(mStkLayout->currentWidget() == mLoginView) {
+            // 设置当前控件
             mStkLayout->setCurrentWidget(mEnterView);
+            // 发送获取试卷数据请求
+            QByteArray array;
+            QXmlStreamWriter xml(&array);
+            xml.writeStartDocument();
+            xml.writeStartElement("ESDtg");
+            xml.writeAttribute("Type", "ExamDataRequest");
+            xml.writeEndElement();
+            xml.writeEndDocument();
+            tcpSendDatagram(array);
+        }
+    } else if(type == "ExamData") {
+        if(mStkLayout->currentWidget() == mEnterView) {
+            qDebug() << doc.toString();
+        }
     } else return false;
 
     return true;
@@ -104,11 +119,11 @@ qint64 Widget::tcpSendDatagram(const QByteArray &array) {
     return mTcpSocket->write(QByteArray((char*)&len, 4) + array);
 }
 
-void Widget::udpSendServerSearch() {
+void Widget::udpSendSearchServer() {
     QByteArray array;
     QXmlStreamWriter xml(&array);
     xml.writeStartDocument();
-    xml.writeStartElement("ESDatagram");
+    xml.writeStartElement("ESDtg");
     xml.writeAttribute("Type", "SearchServer");
     xml.writeCharacters(mAddress.toString());
     xml.writeEndElement();
@@ -151,7 +166,7 @@ void Widget::onTcpConnected() {
     QByteArray array;
     QXmlStreamWriter xml(&array);
     xml.writeStartDocument();
-    xml.writeStartElement("ESDatagram");
+    xml.writeStartElement("ESDtg");
     xml.writeAttribute("Type", "TcpVerify");
     xml.writeAttribute("StuName", mLoginView->stuName());
     xml.writeAttribute("Salt", QString::number(salt));
