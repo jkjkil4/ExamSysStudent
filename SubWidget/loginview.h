@@ -59,6 +59,9 @@ signals:
     void flushServer();
     void connectServer();
 
+public slots:
+    void onBtnAboutClicked();
+
 private:
     Ui::LoginView *ui;
 

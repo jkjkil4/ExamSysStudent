@@ -2,6 +2,8 @@
 #include "ui_loginview.h"
 
 #include <QStyle>
+#include <QMenu>
+#include <QMessageBox>
 
 LoginView::LoginView(QWidget *parent) :
     QWidget(parent),
@@ -11,6 +13,7 @@ LoginView::LoginView(QWidget *parent) :
     ui->btnFlush->setIcon(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_BrowserReload));
     connect(ui->btnFlush, SIGNAL(clicked()), this, SIGNAL(flushServer()));
     connect(ui->btnConnect, SIGNAL(clicked()), this, SIGNAL(connectServer()));
+    connect(ui->btnAbout, &QPushButton::clicked, this, &LoginView::onBtnAboutClicked);
 
     clearServer();
 }
@@ -42,4 +45,26 @@ const LoginView::Server* LoginView::currentServer() {
         return nullptr;
     ind--;
     return &mListServer[ind];
+}
+
+void LoginView::onBtnAboutClicked() {
+    QAction actAbout("关于");
+    connect(&actAbout, &QAction::triggered, [this] {
+        QMessageBox::about(
+                    this, "关于",
+                    "ExamSysStudent v0.1<br>"
+                    "作者: jkjkil4<br>"
+                    "gitee: <a href=https://gitee.com/jkjkil4/ExamSysStudent>https://gitee.com/jkjkil4/ExamSysStudent</a>");
+    });
+
+    QAction actAboutQt("关于Qt");
+    connect(&actAboutQt, &QAction::triggered, [this] {
+        QMessageBox::aboutQt(this);
+    });
+
+    QMenu menu;
+    menu.addAction(&actAbout);
+    menu.addAction(&actAboutQt);
+    menu.move(mapToGlobal(ui->btnAbout->pos() + QPoint(0, ui->btnAbout->height())));
+    menu.exec();
 }
