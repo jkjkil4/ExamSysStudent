@@ -22,6 +22,10 @@ public:
     Widget(QWidget *parent = nullptr);
     ~Widget() override;
 
+    bool parseUdpDatagram(const QByteArray &array);
+    bool parseTcpDatagram(const QByteArray &array);
+    qint64 tcpSendDatagram(const QByteArray &array);
+
 public slots:
     void udpSendServerSearch();
     void onUdpReadyRead();
@@ -31,6 +35,7 @@ public slots:
 
     void onTcpConnected();
     void onTcpDisconnected();
+    void onTcpReadyRead();
     void onTcpError(QAbstractSocket::SocketError err);
 
 private:
@@ -38,6 +43,8 @@ private:
     QTcpSocket *mTcpSocket;
     QHostAddress mAddress;
     QStackedLayout *mStkLayout;
+
+    QByteArray mTcpBuffer;
 
     LoginView *mLoginView;
     EnterView *mEnterView;

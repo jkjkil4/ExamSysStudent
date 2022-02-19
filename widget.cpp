@@ -47,6 +47,7 @@ Widget::Widget(QWidget *parent)
     connect(mUdpSocket, &QUdpSocket::readyRead, this, &Widget::onUdpReadyRead);
     connect(mTcpSocket, &QTcpSocket::connected, this, &Widget::onTcpConnected);
     connect(mTcpSocket, &QTcpSocket::disconnected, this, &Widget::onTcpDisconnected);
+    connect(mTcpSocket, &QTcpSocket::readyRead, this, &Widget::onTcpReadyRead);
     connect(mTcpSocket, QOverload<QAbstractSocket::SocketError>::of(&QTcpSocket::error), this, &Widget::onTcpError);
 
     connect(mLoginView, &LoginView::flushServer, this, &Widget::udpSendServerSearch);
@@ -59,6 +60,48 @@ Widget::~Widget()
 {
     if(mTcpSocket->state() != QTcpSocket::UnconnectedState)
         mTcpSocket->disconnectFromHost();
+}
+
+bool Widget::parseUdpDatagram(const QByteArray &array) {
+    QDomDocument doc;
+    if(!doc.setContent(array))
+        return false;
+    QDomElement root = doc.documentElement();
+    if(root.tagName() != "ESDatagram")
+        return false;
+
+    QString type = root.attribute("Type");
+    if(type == "SearchServerRetval") {
+        QString address = root.attribute("Address");
+        quint16 port = root.attribute("Port").toUShort();
+        QString name = root.text();
+        mLoginView->addServer(address, port, name);
+    } else if(type == "VerifyErr") {
+        mLoginView->setBtnEnabled(true);
+        QMessageBox::critical(this, "连接错误", root.text());
+    } else  return false;
+
+    return true;
+}
+bool Widget::parseTcpDatagram(const QByteArray &array) {
+    QDomDocument doc;
+    if(!doc.setContent(array))
+        return false;
+    QDomElement root = doc.documentElement();
+    if(root.tagName() != "ESDatagram")
+        return false;
+
+    QString type = root.attribute("Type");
+    if(type == "VerifySucc") {
+        if(mStkLayout->currentWidget() == mLoginView)
+            mStkLayout->setCurrentWidget(mEnterView);
+    } else return false;
+
+    return true;
+}
+qint64 Widget::tcpSendDatagram(const QByteArray &array) {
+    int len = array.length();
+    return mTcpSocket->write(QByteArray((char*)&len, 4) + array);
 }
 
 void Widget::udpSendServerSearch() {
@@ -79,26 +122,7 @@ void Widget::onUdpReadyRead() {
     while (mUdpSocket->hasPendingDatagrams()) {
         datagram.resize(int(mUdpSocket->pendingDatagramSize()));
         mUdpSocket->readDatagram(datagram.data(), datagram.size());
-        QDomDocument doc;
-        if(!doc.setContent(datagram))
-            continue;
-        QDomElement root = doc.documentElement();
-        if(root.tagName() != "ESDatagram")
-            continue;
-
-        QString type = root.attribute("Type");
-        if(type == "SearchServerRetval") {
-            QString address = root.attribute("Address");
-            quint16 port = root.attribute("Port").toUShort();
-            QString name = root.text();
-            mLoginView->addServer(address, port, name);
-        } else if(type == "VerifyErr") {
-            mLoginView->setBtnEnabled(true);
-            QMessageBox::critical(this, "连接错误", root.text());
-        } else if(type == "VerifySucc") {
-            if(mStkLayout->currentWidget() == mLoginView)
-                mStkLayout->setCurrentWidget(mEnterView);
-        }
+        parseUdpDatagram(datagram);
     }
 }
 
@@ -138,6 +162,17 @@ void Widget::onTcpConnected() {
 }
 void Widget::onTcpDisconnected() {
     mLoginView->setBtnEnabled(true);
+}
+void Widget::onTcpReadyRead() {
+    mTcpBuffer += mTcpSocket->readAll();
+
+    if(mTcpBuffer.length() < 4)
+        return;
+    int len = *reinterpret_cast<int*>(mTcpBuffer.data());
+    while(mTcpBuffer.length() >= 4 + len) {
+        parseTcpDatagram(mTcpBuffer.mid(4, len));
+        mTcpBuffer.remove(0, 4 + len);
+    }
 }
 void Widget::onTcpError(QAbstractSocket::SocketError err) {
     if(err == QAbstractSocket::RemoteHostClosedError)
