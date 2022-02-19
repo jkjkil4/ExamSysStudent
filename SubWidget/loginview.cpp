@@ -54,7 +54,8 @@ void LoginView::onBtnAboutClicked() {
                     this, "关于",
                     "ExamSysStudent v0.1<br>"
                     "作者: jkjkil4<br>"
-                    "gitee: <a href=https://gitee.com/jkjkil4/ExamSysStudent>https://gitee.com/jkjkil4/ExamSysStudent</a>");
+                    "gitee: <a href=https://gitee.com/jkjkil4/ExamSysStudent>https://gitee.com/jkjkil4/ExamSysStudent</a><br>"
+                    "github: <a href=https://github.com/jkjkil4/ExamSysStudent>https://github.com/jkjkil4/ExamSysStudent</a>");
     });
 
     QAction actAboutQt("关于Qt");
