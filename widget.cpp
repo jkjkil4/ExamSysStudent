@@ -21,7 +21,8 @@ Widget::Widget(QWidget *parent)
     : QWidget(parent),
       mUdpSocket(new QUdpSocket(this)), mTcpSocket(new QTcpSocket(this)),
       mStkLayout(new QStackedLayout),
-      mLoginView(new LoginView(this)), mExamView(new ExamView(this))
+      mLoginView(new LoginView(this)), mExamView(new ExamView(this)),
+      mMulticastAddress("239.255.43.21")
 {
     mStkLayout->addWidget(mLoginView);
     mStkLayout->addWidget(mExamView);
@@ -43,6 +44,7 @@ Widget::Widget(QWidget *parent)
         mAddress = QHostAddress::LocalHost;
 
     mUdpSocket->bind(mAddress, 40565, QUdpSocket::ShareAddress);
+    mUdpSocket->joinMulticastGroup(mMulticastAddress);
 
     connect(mUdpSocket, &QUdpSocket::readyRead, this, &Widget::onUdpReadyRead);
     connect(mTcpSocket, &QTcpSocket::connected, this, &Widget::onTcpConnected);
@@ -79,7 +81,13 @@ bool Widget::parseUdpDatagram(const QByteArray &array) {
     } else if(type == "VerifyErr") {
         mLoginView->setViewEnabled(true);
         QMessageBox::critical(this, "连接错误", root.text());
-    } else  return false;
+    } else if(type == "UpdTime") {
+        if(QHostAddress(root.attribute("Address")) == mTcpSocket->peerAddress() && root.attribute("Port").toUShort() == mTcpSocket->peerPort()) {
+            QDateTime dateTime = QDateTime::fromString(root.text(), "yyyy/M/d H:m:s");
+            if(dateTime.isValid())
+                mExamView->setCurDateTime(dateTime);
+        }
+    } else return false;
 
     return true;
 }

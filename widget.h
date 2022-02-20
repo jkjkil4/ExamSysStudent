@@ -44,8 +44,9 @@ private:
     QHostAddress mAddress;
     QStackedLayout *mStkLayout;
 
-    QByteArray mTcpBuffer;
-
     LoginView *mLoginView;
     ExamView *mExamView;
+
+    QHostAddress mMulticastAddress;
+    QByteArray mTcpBuffer;
 };
