@@ -25,13 +25,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
-        SubWidget/enterview.cpp \
+        SubWidget/examview.cpp \
         SubWidget/loginview.cpp \
         main.cpp \
         widget.cpp
 
 HEADERS += \
-        SubWidget/enterview.h \
+        SubWidget/examview.h \
         SubWidget/loginview.h \
         widget.h
 
@@ -41,7 +41,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 FORMS += \
-    SubWidget/enterview.ui \
+    SubWidget/examview.ui \
     SubWidget/loginview.ui
 
 RESOURCES += \

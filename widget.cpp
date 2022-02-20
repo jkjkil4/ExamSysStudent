@@ -15,16 +15,16 @@
 #include <QMetaEnum>
 
 #include "SubWidget/loginview.h"
-#include "SubWidget/enterview.h"
+#include "SubWidget/examview.h"
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent),
       mUdpSocket(new QUdpSocket(this)), mTcpSocket(new QTcpSocket(this)),
       mStkLayout(new QStackedLayout),
-      mLoginView(new LoginView(this)), mEnterView(new EnterView(this))
+      mLoginView(new LoginView(this)), mExamView(new ExamView(this))
 {
     mStkLayout->addWidget(mLoginView);
-    mStkLayout->addWidget(mEnterView);
+    mStkLayout->addWidget(mExamView);
     mStkLayout->setCurrentWidget(mLoginView);
     mStkLayout->setMargin(0);
     setLayout(mStkLayout);
@@ -77,7 +77,7 @@ bool Widget::parseUdpDatagram(const QByteArray &array) {
         QString name = root.text();
         mLoginView->addServer(address, port, name);
     } else if(type == "VerifyErr") {
-        mLoginView->setBtnEnabled(true);
+        mLoginView->setViewEnabled(true);
         QMessageBox::critical(this, "连接错误", root.text());
     } else  return false;
 
@@ -95,7 +95,8 @@ bool Widget::parseTcpDatagram(const QByteArray &array) {
     if(type == "VerifySucc") {
         if(mStkLayout->currentWidget() == mLoginView) {
             // 设置当前控件
-            mStkLayout->setCurrentWidget(mEnterView);
+            mExamView->clear();
+            mStkLayout->setCurrentWidget(mExamView);
             // 发送获取试卷数据请求
             QByteArray array;
             QXmlStreamWriter xml(&array);
@@ -107,8 +108,18 @@ bool Widget::parseTcpDatagram(const QByteArray &array) {
             tcpSendDatagram(array);
         }
     } else if(type == "ExamData") {
-        if(mStkLayout->currentWidget() == mEnterView) {
-            qDebug() << doc.toString();
+        if(mStkLayout->currentWidget() == mExamView) {
+            // 设置考试信息
+            mExamView->setExamName(root.attribute("Name"));
+
+            // 设置时间显示
+            const QString dateTimeFmt = "yyyy/M/d H:m:s";
+            mExamView->setStartDateTime(QDateTime::fromString(root.attribute("StartDateTime"), dateTimeFmt));
+            mExamView->setEndDateTime(QDateTime::fromString(root.attribute("EndDateTime"), dateTimeFmt));
+            mExamView->setCurDateTime(QDateTime::fromString(root.attribute("CurDateTime"), dateTimeFmt));
+
+            // 设置考生信息
+            mExamView->setStuName(mLoginView->stuName());
         }
     } else return false;
 
@@ -152,7 +163,7 @@ void Widget::onConnectServer() {
     // 连接服务端
     if(mTcpSocket->state() != QTcpSocket::UnconnectedState)
         mTcpSocket->disconnectFromHost();
-    mLoginView->setBtnEnabled(false);
+    mLoginView->setViewEnabled(false);
     mTcpSocket->connectToHost(QHostAddress(srv->address), srv->port);
 }
 
@@ -176,7 +187,7 @@ void Widget::onTcpConnected() {
     mTcpSocket->write(array);
 }
 void Widget::onTcpDisconnected() {
-    mLoginView->setBtnEnabled(true);
+    mLoginView->setViewEnabled(true);
 }
 void Widget::onTcpReadyRead() {
     mTcpBuffer += mTcpSocket->readAll();
@@ -192,6 +203,6 @@ void Widget::onTcpReadyRead() {
 void Widget::onTcpError(QAbstractSocket::SocketError err) {
     if(err == QAbstractSocket::RemoteHostClosedError)
         return;
-    mLoginView->setBtnEnabled(true);
+    mLoginView->setViewEnabled(true);
     QMessageBox::critical(this, "连接错误", QMetaEnum::fromType<QAbstractSocket::SocketError>().valueToKey(err));
 }

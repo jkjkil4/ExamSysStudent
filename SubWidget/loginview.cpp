@@ -23,8 +23,8 @@ LoginView::~LoginView()
     delete ui;
 }
 
-void LoginView::setBtnEnabled(bool enabled) {
-    ui->btnConnect->setEnabled(enabled);
+void LoginView::setViewEnabled(bool enabled) {
+    ui->centralWidget->setEnabled(enabled);
 }
 
 void LoginView::clearServer() {

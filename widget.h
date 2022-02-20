@@ -10,7 +10,7 @@ class QDomElement;
 class QStackedLayout;
 
 class LoginView;
-class EnterView;
+class ExamView;
 
 /**
  * @brief   窗口控件
@@ -47,5 +47,5 @@ private:
     QByteArray mTcpBuffer;
 
     LoginView *mLoginView;
-    EnterView *mEnterView;
+    ExamView *mExamView;
 };

@@ -6,6 +6,9 @@ namespace Ui {
 class LoginView;
 }
 
+/**
+ * @brief   登录界面
+ */
 class LoginView : public QWidget
 {
     Q_OBJECT
@@ -22,10 +25,10 @@ public:
     ~LoginView();
 
     /**
-     * @brief   设置进入按钮是否可用
+     * @brief   设置界面是否可用
      * @param   enabled     是否可用
      */
-    void setBtnEnabled(bool enabled);
+    void setViewEnabled(bool enabled);
 
     /**
      * @brief   清空服务端
