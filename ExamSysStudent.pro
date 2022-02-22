@@ -25,14 +25,28 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+        Ques/ques.cpp \
+        Ques/queschoice.cpp \
+        Ques/quesinvalid.cpp \
+        Ques/quesmultichoice.cpp \
+        Ques/quessinglechoice.cpp \
+        Ques/queswhether.cpp \
         SubWidget/examview.cpp \
         SubWidget/loginview.cpp \
+        Widget/doubleslidebutton.cpp \
         main.cpp \
         widget.cpp
 
 HEADERS += \
+        Ques/ques.h \
+        Ques/queschoice.h \
+        Ques/quesinvalid.h \
+        Ques/quesmultichoice.h \
+        Ques/quessinglechoice.h \
+        Ques/queswhether.h \
         SubWidget/examview.h \
         SubWidget/loginview.h \
+        Widget/doubleslidebutton.h \
         widget.h
 
 # Default rules for deployment.

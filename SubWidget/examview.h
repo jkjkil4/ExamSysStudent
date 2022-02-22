@@ -3,9 +3,12 @@
 #include <QWidget>
 
 #include <QDateTime>
+#include <QMap>
 
 class QLabel;
+class QVBoxLayout;
 class QTimer;
+class QDomElement;
 
 namespace Ui {
 class ExamView;
@@ -25,6 +28,9 @@ public:
 
     void setStuName(const QString &stuName);
 
+    void readQues(const QDomElement &elem);
+
+    void clearQues();
     void clear();
 
     void setVisible(bool visible) override;
@@ -36,6 +42,8 @@ public slots:
 private:
     Ui::ExamView *ui;
 
+    QVBoxLayout *mLayoutQues;
+
     // 定时器，用于更新时间
     QTimer *mTimeTimer;
 
@@ -44,4 +52,7 @@ private:
     QDateTime mDateTimeEnd;
     QDateTime mDateTimeCur;
     void setDateTime(QDateTime &v, QLabel *label, const QDateTime &dt);
+
+    // 题目相关
+    QMap<QString, const QMetaObject *> availableQues;
 };

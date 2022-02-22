@@ -117,6 +117,18 @@ bool Widget::parseTcpDatagram(const QByteArray &array) {
         }
     } else if(type == "ExamData") {
         if(mStkLayout->currentWidget() == mExamView) {
+            QDomElement elemQuesList;
+            QDomNode node = root.firstChild();
+            while(!node.isNull()) {
+                QDomElement elem = node.toElement();
+                if(!elem.isNull()) {
+                    if(elem.tagName() == "QuesList") {
+                        elemQuesList = elem;
+                    }
+                }
+                node = node.nextSibling();
+            }
+
             // 设置考试信息
             mExamView->setExamName(root.attribute("Name"));
 
@@ -128,6 +140,9 @@ bool Widget::parseTcpDatagram(const QByteArray &array) {
 
             // 设置考生信息
             mExamView->setStuName(mLoginView->stuName());
+
+            // 加载试卷
+            mExamView->readQues(elemQuesList);
         }
     } else return false;
 
