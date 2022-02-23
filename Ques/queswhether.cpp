@@ -24,6 +24,13 @@ QuesWhether::QuesWhether(QWidget *parent)
     mFrame->setLayout(mLayout);
 }
 
+bool QuesWhether::isDone(QString *pStr) const {
+    if(mButton->state() != DoubleSlideButton::Mid)
+        return true;
+    if(pStr)
+        *pStr = "";
+}
+
 void QuesWhether::readXml(const QDomElement &elem) {
     mLabelBtnLeft->setText(elem.attribute("LTxt"));
     mLabelBtnRight->setText(elem.attribute("RTxt"));

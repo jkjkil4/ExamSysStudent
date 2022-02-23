@@ -35,6 +35,9 @@ public:
 
     void setVisible(bool visible) override;
 
+signals:
+    void sendStuProcRequested(int proc);
+
 public slots:
     void onBtnStartClicked();
     void onTimeTimerTimeout();
@@ -46,6 +49,7 @@ private:
 
     // 定时器，用于更新时间
     QTimer *mTimeTimer;
+    int timeProcessCounter = 0;
 
     // 相关时间
     QDateTime mDateTimeStart;

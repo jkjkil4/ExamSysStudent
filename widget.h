@@ -27,6 +27,8 @@ public:
     qint64 tcpSendDatagram(const QByteArray &array);
 
 public slots:
+    void onSendStuProc(int proc);
+
     void udpSendSearchServer();
     void onUdpReadyRead();
 

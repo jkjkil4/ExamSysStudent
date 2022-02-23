@@ -55,6 +55,8 @@ Widget::Widget(QWidget *parent)
     connect(mLoginView, &LoginView::flushServer, this, &Widget::udpSendSearchServer);
     connect(mLoginView, &LoginView::connectServer, this, &Widget::onConnectServer);
 
+    connect(mExamView, &ExamView::sendStuProcRequested, this, &Widget::onSendStuProc);
+
     udpSendSearchServer();
 }
 
@@ -164,6 +166,18 @@ void Widget::udpSendSearchServer() {
     xml.writeEndDocument();
     mLoginView->clearServer();
     mUdpSocket->writeDatagram(array, QHostAddress::Broadcast, 40565);
+}
+
+void Widget::onSendStuProc(int proc) {
+    QByteArray array;
+    QXmlStreamWriter xml(&array);
+    xml.writeStartDocument();
+    xml.writeStartElement("ESDtg");
+    xml.writeAttribute("Type", "AnsProc");
+    xml.writeCharacters(QString::number(proc));
+    xml.writeEndElement();
+    xml.writeEndDocument();
+    tcpSendDatagram(array);
 }
 
 void Widget::onUdpReadyRead() {

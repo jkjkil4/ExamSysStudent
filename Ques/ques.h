@@ -24,6 +24,8 @@ public:
      */
     void setNumber(int num);
 
+    virtual bool isDone(QString *pStr = nullptr) const;
+
     /**
      * @brief   使用XML方式对题目内容进行读取
      * @param   elem    QDomElement对象，用于读取XML

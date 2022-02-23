@@ -6,6 +6,7 @@
 #include <QTimer>
 
 #include <QDomElement>
+#include <QXmlStreamWriter>
 
 #include "Ques/quessinglechoice.h"
 #include "Ques/quesmultichoice.h"
@@ -63,6 +64,7 @@ void ExamView::readQues(const QDomElement &elem) {
         i++;
         node = node.nextSibling();
     }
+    ui->labelQuesCnt->setText(QString::number(mLayoutQues->count()));
 }
 
 void ExamView::clearQues() {
@@ -100,6 +102,7 @@ void ExamView::onBtnStartClicked() {
     }
     if(mDateTimeEnd <= mDateTimeCur) {
         QMessageBox::information(this, "提示", "考试已结束");
+        return;
     }
     ui->widgetExam->setVisible(true);
     ui->btnStart->setEnabled(false);
@@ -109,6 +112,22 @@ void ExamView::onTimeTimerTimeout() {
     if(!mDateTimeCur.isValid())
         return;
     setDateTime(mDateTimeCur, ui->labelCurTime, mDateTimeCur.addSecs(1));
+    if(ui->widgetExam->isVisible()) {
+        ++timeProcessCounter;
+        if(timeProcessCounter >= 10) {
+            timeProcessCounter = 0;
+            // 得到当前进度
+            int doneCnt = 0;
+            int count = mLayoutQues->count();
+            for(int i = 0; i < count; ++i) {
+                Ques *ques = (Ques*)mLayoutQues->itemAt(i)->widget();
+                if(ques->isDone())
+                    ++doneCnt;
+            }
+
+            emit sendStuProcRequested(doneCnt * 100 / count);
+        }
+    }
 }
 
 void ExamView::setDateTime(QDateTime &v, QLabel *label, const QDateTime &dt) {

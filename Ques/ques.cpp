@@ -27,6 +27,7 @@ void Ques::setNumber(int num) {
     mLabelNum->setText(QString::number(num) + '.');
 }
 
+bool Ques::isDone(QString *) const { return true; }
 void Ques::readXml(const QDomElement &) {}
 void Ques::writeXmlStuAns(QXmlStreamWriter &) const {}
 void Ques::readXmlStuAns(const QDomElement &) {}

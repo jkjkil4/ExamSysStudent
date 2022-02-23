@@ -11,6 +11,7 @@ class QuesWhether : public Ques
 public:
     Q_INVOKABLE explicit QuesWhether(QWidget *parent = nullptr);
 
+    bool isDone(QString *pStr = nullptr) const override;
     void readXml(const QDomElement &elem) override;
     void writeXmlStuAns(QXmlStreamWriter &xml) const override;
     void readXmlStuAns(const QDomElement &elem) override;
