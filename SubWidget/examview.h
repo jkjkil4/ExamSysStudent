@@ -41,10 +41,12 @@ public:
 
 signals:
     void sendStuProcRequested(int proc);
+    void logout();
 
 public slots:
     void onBtnStartClicked();
     void onBtnCheckClicked();
+    void onBtnExitClicked();
 
     void onTimeTimerTimeout();
 

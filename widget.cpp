@@ -56,6 +56,7 @@ Widget::Widget(QWidget *parent)
     connect(mLoginView, &LoginView::connectServer, this, &Widget::onConnectServer);
 
     connect(mExamView, &ExamView::sendStuProcRequested, this, &Widget::onSendStuProc);
+    connect(mExamView, &ExamView::logout, this, &Widget::onLogout);
 
     udpSendSearchServer();
 }
@@ -178,6 +179,12 @@ void Widget::onSendStuProc(int proc) {
     xml.writeEndElement();
     xml.writeEndDocument();
     tcpSendDatagram(array);
+}
+void Widget::onLogout() {
+    mTcpSocket->disconnectFromHost();
+    udpSendSearchServer();
+    mLoginView->clearStuInfo();
+    mStkLayout->setCurrentWidget(mLoginView);
 }
 
 void Widget::onUdpReadyRead() {

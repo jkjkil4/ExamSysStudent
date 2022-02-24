@@ -27,6 +27,11 @@ void LoginView::setViewEnabled(bool enabled) {
     ui->centralWidget->setEnabled(enabled);
 }
 
+void LoginView::clearStuInfo() {
+    ui->editName->clear();
+    ui->editPwd->clear();
+}
+
 void LoginView::clearServer() {
     mListServer.clear();
     ui->cbbServer->clear();

@@ -31,6 +31,7 @@ ExamView::ExamView(QWidget *parent) :
 
     connect(ui->btnStart, &QPushButton::clicked, this, &ExamView::onBtnStartClicked);
     connect(ui->btnCheck, &QPushButton::clicked, this, &ExamView::onBtnCheckClicked);
+    connect(ui->btnExit, SIGNAL(clicked()), this, SIGNAL(logout()));
     connect(mTimeTimer, &QTimer::timeout, this, &ExamView::onTimeTimerTimeout);
 }
 
@@ -180,6 +181,10 @@ void ExamView::onBtnStartClicked() {
 void ExamView::onBtnCheckClicked() {
     if(checkIsDone())
         QMessageBox::information(this, "提示", "所有题目已完成");
+}
+void ExamView::onBtnExitClicked() {
+    // uploadStuAns();
+    emit logout();
 }
 
 void ExamView::onTimeTimerTimeout() {

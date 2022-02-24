@@ -31,6 +31,11 @@ public:
     void setViewEnabled(bool enabled);
 
     /**
+     * @brief   清空考生信息
+     */
+    void clearStuInfo();
+
+    /**
      * @brief   清空服务端
      */
     void clearServer();
