@@ -16,7 +16,8 @@
 
 ExamView::ExamView(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::ExamView), mLayoutQues(new QVBoxLayout),
+    ui(new Ui::ExamView),
+    mLayoutExam(new QVBoxLayout), mLayoutQues(new QVBoxLayout),
     mTimeTimer(new QTimer(this)),
     availableQues({
                   {"QuesSingleChoice", &QuesSingleChoice::staticMetaObject},
@@ -27,7 +28,10 @@ ExamView::ExamView(QWidget *parent) :
     ui->setupUi(this);
 
     ui->splitter->setSizes(QList<int>() << 10 << 600);
-    ui->widgetExam->setLayout(mLayoutQues);
+    mLayoutExam->addLayout(mLayoutQues);
+    mLayoutExam->addStretch();
+    ui->widgetExam->widget()->setLayout(mLayoutExam);
+    ui->widgetExam->widget()->setStyleSheet("QWidget#widgetExamContents{background-color: white;}");
 
     connect(ui->btnStart, &QPushButton::clicked, this, &ExamView::onBtnStartClicked);
     connect(ui->btnCheck, &QPushButton::clicked, this, &ExamView::onBtnCheckClicked);

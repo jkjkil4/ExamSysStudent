@@ -53,7 +53,7 @@ public slots:
 private:
     Ui::ExamView *ui;
 
-    QVBoxLayout *mLayoutQues;
+    QVBoxLayout *mLayoutExam, *mLayoutQues;
 
     // 定时器，用于更新时间
     QTimer *mTimeTimer;
