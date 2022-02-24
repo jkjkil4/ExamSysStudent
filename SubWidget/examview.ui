@@ -243,6 +243,30 @@ QPushButton:pressed{
             </item>
            </layout>
           </item>
+          <item>
+           <layout class="QHBoxLayout" name="layoutUploadTime" stretch="0,1">
+            <item>
+             <widget class="QLabel" name="labelUploadTimeText">
+              <property name="text">
+               <string>最后一次上传:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="labelUploadTime">
+              <property name="text">
+               <string>暂无</string>
+              </property>
+              <property name="textFormat">
+               <enum>Qt::PlainText</enum>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
          </layout>
         </widget>
        </item>
@@ -287,30 +311,6 @@ QPushButton:pressed{
              <string>上传试卷</string>
             </property>
            </widget>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="layoutUploadTime" stretch="0,1">
-            <item>
-             <widget class="QLabel" name="labelUploadTimeText">
-              <property name="text">
-               <string>最后一次上传:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="labelUploadTime">
-              <property name="text">
-               <string>暂无</string>
-              </property>
-              <property name="textFormat">
-               <enum>Qt::PlainText</enum>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-           </layout>
           </item>
           <item>
            <spacer name="verSpacerBtn">
