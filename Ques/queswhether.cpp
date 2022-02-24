@@ -28,7 +28,8 @@ bool QuesWhether::isDone(QString *pStr) const {
     if(mButton->state() != DoubleSlideButton::Mid)
         return true;
     if(pStr)
-        *pStr = "";
+        *pStr = "未选择选项";
+    return false;
 }
 
 void QuesWhether::readXml(const QDomElement &elem) {

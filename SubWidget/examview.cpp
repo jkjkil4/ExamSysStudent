@@ -2,6 +2,7 @@
 #include "ui_examview.h"
 
 #include <QMessageBox>
+#include <QScrollArea>
 
 #include <QTimer>
 
@@ -29,6 +30,7 @@ ExamView::ExamView(QWidget *parent) :
     ui->widgetExam->setLayout(mLayoutQues);
 
     connect(ui->btnStart, &QPushButton::clicked, this, &ExamView::onBtnStartClicked);
+    connect(ui->btnCheck, &QPushButton::clicked, this, &ExamView::onBtnCheckClicked);
     connect(mTimeTimer, &QTimer::timeout, this, &ExamView::onTimeTimerTimeout);
 }
 
@@ -84,13 +86,81 @@ void ExamView::clear() {
     ui->labelCurTime->clear();
     ui->labelStuName->clear();
     clearQues();
-    ui->widgetExam->setVisible(false);
+    setExamVisible(false);
     ui->btnStart->setEnabled(true);
+    ui->labelUploadTime->setText("暂无");
+}
+
+void ExamView::setExamVisible(bool visible) {
+    ui->widgetExam->setVisible(visible);
+    ui->btnStart->setVisible(!visible);
+    ui->widgetButtons->setVisible(visible);
 }
 
 void ExamView::setVisible(bool visible) {
     visible ? mTimeTimer->start(1000) : mTimeTimer->stop();
     QWidget::setVisible(visible);
+}
+
+bool ExamView::checkIsDone() {
+    struct Unfinished { int ind; QString what; };
+
+    // 遍历题目检查是否有未完成的题目
+    QList<Unfinished> listUnfinished;
+    int count = mLayoutQues->count();
+    for(int i = 0; i < count; ++i) {
+        Ques *ques = (Ques*)mLayoutQues->itemAt(i)->widget();
+        QString what;
+        if(!ques->isDone(&what))
+            listUnfinished << Unfinished{ i, what };
+    }
+
+    // 如果没有未完成的题目，则退出函数
+    if(listUnfinished.isEmpty())
+        return true;
+
+    // 创建控件并显示
+    QVBoxLayout *layoutArea = new QVBoxLayout;
+    for(const Unfinished &unf : listUnfinished) {
+        QLabel *label = new QLabel(QString::number(unf.ind + 1) + '.');
+        label->setObjectName("left");
+        QLabel *labelWhat = new QLabel(unf.what);
+        labelWhat->adjustSize();
+        QHBoxLayout *layout = new QHBoxLayout;
+        layout->addWidget(label);
+        layout->addWidget(labelWhat, 1);
+        layoutArea->addLayout(layout);
+    }
+    layoutArea->addStretch();
+
+    QScrollArea *area = new QScrollArea;
+    area->setStyleSheet("QScrollArea{"
+                        "    background-color: white;"
+                        "}"
+                        "QLabel#left{"
+                        "    border: 2px solid rgb(26, 222, 209);"
+                        "    color: #FFFFFF;"
+                        "    background-color: rgb(26, 222, 209);"
+                        "}");
+    QWidget *areaWidget = new QWidget;
+    areaWidget->setObjectName("areaWidget");
+    areaWidget->setStyleSheet("QWidget#areaWidget{"
+                              "    background-color: white;"
+                              "}");
+    areaWidget->setLayout(layoutArea);
+    area->setWidget(areaWidget);
+
+    QHBoxLayout *layoutDialog = new QHBoxLayout;
+    layoutDialog->setMargin(0);
+    layoutDialog->addWidget(area);
+
+    QDialog dialog(this);
+    dialog.setWindowTitle("以下题目未完成");
+    dialog.setLayout(layoutDialog);
+    dialog.resize(300, 400);
+    dialog.exec();
+
+    return false;
 }
 
 void ExamView::onBtnStartClicked() {
@@ -104,8 +174,12 @@ void ExamView::onBtnStartClicked() {
         QMessageBox::information(this, "提示", "考试已结束");
         return;
     }
-    ui->widgetExam->setVisible(true);
+    setExamVisible(true);
     ui->btnStart->setEnabled(false);
+}
+void ExamView::onBtnCheckClicked() {
+    if(checkIsDone())
+        QMessageBox::information(this, "提示", "所有题目已完成");
 }
 
 void ExamView::onTimeTimerTimeout() {

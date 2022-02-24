@@ -33,13 +33,19 @@ public:
     void clearQues();
     void clear();
 
+    void setExamVisible(bool visible);
+
     void setVisible(bool visible) override;
+
+    bool checkIsDone();
 
 signals:
     void sendStuProcRequested(int proc);
 
 public slots:
     void onBtnStartClicked();
+    void onBtnCheckClicked();
+
     void onTimeTimerTimeout();
 
 private:
