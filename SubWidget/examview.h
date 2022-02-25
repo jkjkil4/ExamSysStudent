@@ -9,6 +9,7 @@ class QLabel;
 class QVBoxLayout;
 class QTimer;
 class QDomElement;
+class QXmlStreamWriter;
 
 namespace Ui {
 class ExamView;
@@ -25,10 +26,24 @@ public:
     void setStartDateTime(const QDateTime &dt);
     void setEndDateTime(const QDateTime &dt);
     void setCurDateTime(const QDateTime &dt);
+    QDateTime curDateTime() { return mDateTimeCur; }
 
     void setStuName(const QString &stuName);
 
+    void setLastUploadDateTime(const QDateTime &dt);
+
+    /**
+     * @brief   读取题目
+     * @param   elem    QDomElement对象，用于读取XML
+     */
     void readQues(const QDomElement &elem);
+
+    /**
+     * @brief   写入考生答案
+     * @param   xml     QXmlStreamWriter对象，用于写入XML
+     * 未使用总Element对所有子节点进行包含，而是直接写入子节点
+     */
+    void writeXmlStuAns(QXmlStreamWriter &xml) const;
 
     void clearQues();
     void clear();
@@ -41,6 +56,7 @@ public:
 
 signals:
     void sendStuProcRequested(int proc);
+    void sendStuAnsRequested();
     void logout();
 
 public slots:

@@ -56,6 +56,7 @@ Widget::Widget(QWidget *parent)
     connect(mLoginView, &LoginView::connectServer, this, &Widget::onConnectServer);
 
     connect(mExamView, &ExamView::sendStuProcRequested, this, &Widget::onSendStuProc);
+    connect(mExamView, &ExamView::sendStuAnsRequested, this, &Widget::onSendStuAns);
     connect(mExamView, &ExamView::logout, this, &Widget::onLogout);
 
     udpSendSearchServer();
@@ -147,6 +148,8 @@ bool Widget::parseTcpDatagram(const QByteArray &array) {
             // 加载试卷
             mExamView->readQues(elemQuesList);
         }
+    } else if(type == "StuAnsReceived") {
+        mExamView->setLastUploadDateTime(QDateTime::fromString(root.text(), "yyyy/M/d HH:mm:ss"));
     } else return false;
 
     return true;
@@ -176,6 +179,18 @@ void Widget::onSendStuProc(int proc) {
     xml.writeStartElement("ESDtg");
     xml.writeAttribute("Type", "AnsProc");
     xml.writeCharacters(QString::number(proc));
+    xml.writeEndElement();
+    xml.writeEndDocument();
+    tcpSendDatagram(array);
+}
+void Widget::onSendStuAns() {
+    QByteArray array;
+    QXmlStreamWriter xml(&array);
+    xml.writeStartDocument();
+    xml.writeStartElement("ESDtg");
+    xml.writeAttribute("Type", "StuAns");
+    xml.writeAttribute("Time", mExamView->curDateTime().toString("yyyy/M/d H:m:s"));
+    mExamView->writeXmlStuAns(xml);
     xml.writeEndElement();
     xml.writeEndDocument();
     tcpSendDatagram(array);

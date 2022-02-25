@@ -28,6 +28,7 @@ public:
 
 public slots:
     void onSendStuProc(int proc);
+    void onSendStuAns();
     void onLogout();
 
     void udpSendSearchServer();

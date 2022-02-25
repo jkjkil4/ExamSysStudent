@@ -35,6 +35,7 @@ ExamView::ExamView(QWidget *parent) :
 
     connect(ui->btnStart, &QPushButton::clicked, this, &ExamView::onBtnStartClicked);
     connect(ui->btnCheck, &QPushButton::clicked, this, &ExamView::onBtnCheckClicked);
+    connect(ui->btnUpload, SIGNAL(clicked()), this, SIGNAL(sendStuAnsRequested()));
     connect(ui->btnExit, &QPushButton::clicked, this, &ExamView::onBtnExitClicked);
     connect(mTimeTimer, &QTimer::timeout, this, &ExamView::onTimeTimerTimeout);
 }
@@ -50,6 +51,8 @@ void ExamView::setEndDateTime(const QDateTime &dt) { setDateTime(mDateTimeEnd, u
 void ExamView::setCurDateTime(const QDateTime &dt) { setDateTime(mDateTimeCur, ui->labelCurTime, dt); }
 
 void ExamView::setStuName(const QString &stuName) { ui->labelStuName->setText(stuName); }
+
+void ExamView::setLastUploadDateTime(const QDateTime &dt) { ui->labelUploadTime->setText(dt.toString("HH:mm:ss")); }
 
 void ExamView::readQues(const QDomElement &elem) {
     clearQues();
@@ -72,6 +75,14 @@ void ExamView::readQues(const QDomElement &elem) {
         node = node.nextSibling();
     }
     ui->labelQuesCnt->setText(QString::number(mLayoutQues->count()));
+}
+
+void ExamView::writeXmlStuAns(QXmlStreamWriter &xml) const {
+    int count = mLayoutQues->count();
+    for(int i = 0; i < count; ++i) {
+        Ques *ques = (Ques*)mLayoutQues->itemAt(i)->widget();
+        ques->writeXmlStuAns(xml);
+    }
 }
 
 void ExamView::clearQues() {
