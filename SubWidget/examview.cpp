@@ -54,7 +54,7 @@ void ExamView::setStuName(const QString &stuName) { ui->labelStuName->setText(st
 
 void ExamView::setLastUploadDateTime(const QDateTime &dt) { ui->labelUploadTime->setText(dt.toString("HH:mm:ss")); }
 
-void ExamView::readQues(const QDomElement &elem) {
+void ExamView::readXmlQues(const QDomElement &elem) {
     clearQues();
     QDomNode node = elem.firstChild();
     int i = 1;
@@ -75,6 +75,21 @@ void ExamView::readQues(const QDomElement &elem) {
         node = node.nextSibling();
     }
     ui->labelQuesCnt->setText(QString::number(mLayoutQues->count()));
+}
+
+void ExamView::readXmlStuAns(const QDomElement &elem) {
+    setLastUploadDateTime(QDateTime::fromString(elem.attribute("Time"), "yyyy/M/d H:m:s"));
+    QDomNode node = elem.firstChild();
+    int i = 0;
+    while(!node.isNull()) {
+        QDomElement elem = node.toElement();
+        if(!elem.isNull()) {
+            Ques *ques = (Ques*)mLayoutQues->itemAt(i)->widget();
+            ques->readXmlStuAns(elem);
+            ++i;
+        }
+        node = node.nextSibling();
+    }
 }
 
 void ExamView::writeXmlStuAns(QXmlStreamWriter &xml) const {

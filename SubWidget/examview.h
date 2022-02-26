@@ -36,7 +36,13 @@ public:
      * @brief   读取题目
      * @param   elem    QDomElement对象，用于读取XML
      */
-    void readQues(const QDomElement &elem);
+    void readXmlQues(const QDomElement &elem);
+
+    /**
+     * @brief   读取考生作答
+     * @param   elem    QDomElement对象，用于读取XML
+     */
+    void readXmlStuAns(const QDomElement &elem);
 
     /**
      * @brief   写入考生答案

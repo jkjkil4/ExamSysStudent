@@ -69,12 +69,12 @@ void QuesChoice::readXmlStuAns(const QDomElement &elem) {
     }
 
     // 读取选中状态
-    QStringList ansList = elem.text().split(';', QString::KeepEmptyParts);
+    QStringList ansList = elem.text().split(';', QString::SkipEmptyParts);
     for(const QString &ans : ansList) {
         int ind = ans.toInt();
         if(ind >= 0 && ind < count) {
             QAbstractButton *btn = (QAbstractButton*)mLayoutButtons->itemAt(ind)->widget();
-            btn->setChecked(false);
+            btn->setChecked(true);
         }
     }
 }

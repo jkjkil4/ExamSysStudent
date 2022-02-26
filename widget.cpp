@@ -115,6 +115,7 @@ bool Widget::parseTcpDatagram(const QByteArray &array) {
             xml.writeStartDocument();
             xml.writeStartElement("ESDtg");
             xml.writeAttribute("Type", "ExamDataRequest");
+            xml.writeAttribute("StuAnsRequest", "1");
             xml.writeEndElement();
             xml.writeEndDocument();
             tcpSendDatagram(array);
@@ -122,12 +123,15 @@ bool Widget::parseTcpDatagram(const QByteArray &array) {
     } else if(type == "ExamData") {
         if(mStkLayout->currentWidget() == mExamView) {
             QDomElement elemQuesList;
+            QDomElement elemStuAns;
             QDomNode node = root.firstChild();
             while(!node.isNull()) {
                 QDomElement elem = node.toElement();
                 if(!elem.isNull()) {
                     if(elem.tagName() == "QuesList") {
                         elemQuesList = elem;
+                    } else if(elem.tagName() == "StuAns") {
+                        elemStuAns = elem;
                     }
                 }
                 node = node.nextSibling();
@@ -146,7 +150,20 @@ bool Widget::parseTcpDatagram(const QByteArray &array) {
             mExamView->setStuName(mLoginView->stuName());
 
             // 加载试卷
-            mExamView->readQues(elemQuesList);
+            mExamView->readXmlQues(elemQuesList);
+            // 加载作答记录
+            do {
+                if(elemStuAns.isNull())
+                    break;
+                QDomDocument docStuAns;
+                if(!docStuAns.setContent(elemStuAns.text()))
+                    break;
+                mExamView->readXmlStuAns(docStuAns.documentElement());
+            } while(false);
+            if(!elemStuAns.isNull()) {
+                QDomElement docStuAns;
+
+            }
         }
     } else if(type == "StuAnsReceived") {
         mExamView->setLastUploadDateTime(QDateTime::fromString(root.text(), "yyyy/M/d HH:mm:ss"));
