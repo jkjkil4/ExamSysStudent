@@ -36,6 +36,8 @@ ExamView::ExamView(QWidget *parent) :
     connect(ui->btnStart, &QPushButton::clicked, this, &ExamView::onBtnStartClicked);
     connect(ui->btnCheck, &QPushButton::clicked, this, &ExamView::onBtnCheckClicked);
     connect(ui->btnUpload, SIGNAL(clicked()), this, SIGNAL(sendStuAnsRequested()));
+    connect(ui->btnFinish, SIGNAL(clicked()), this, SIGNAL(sendStuFinishRequested()));
+    connect(ui->btnReconnect, SIGNAL(clicked()), this, SIGNAL(reconnectRequested()));
     connect(ui->btnExit, &QPushButton::clicked, this, &ExamView::onBtnExitClicked);
     connect(mTimeTimer, &QTimer::timeout, this, &ExamView::onTimeTimerTimeout);
 }
@@ -49,6 +51,10 @@ void ExamView::setExamName(const QString &examName) { ui->labelExamName->setText
 void ExamView::setStartDateTime(const QDateTime &dt) { setDateTime(mDateTimeStart, ui->labelStartTime, dt); }
 void ExamView::setEndDateTime(const QDateTime &dt) { setDateTime(mDateTimeEnd, ui->labelEndTime, dt); }
 void ExamView::setCurDateTime(const QDateTime &dt) { setDateTime(mDateTimeCur, ui->labelCurTime, dt); }
+void ExamView::setSrvState(bool isConnected) {
+    ui->labelSrvStat->setText(isConnected ? "已连接" : "未连接");
+    ui->btnReconnect->setVisible(!isConnected);
+}
 
 void ExamView::setStuName(const QString &stuName) { ui->labelStuName->setText(stuName); }
 
@@ -115,6 +121,7 @@ void ExamView::clear() {
     ui->labelStartTime->clear();
     ui->labelEndTime->clear();
     ui->labelCurTime->clear();
+    ui->labelSrvStat->clear();
     ui->labelStuName->clear();
     clearQues();
     setExamVisible(false);

@@ -12,6 +12,8 @@
 
 #include <QCryptographicHash>
 #include <QRandomGenerator>
+#include <QTimer>
+#include <QCloseEvent>
 #include <QMetaEnum>
 
 #include "SubWidget/loginview.h"
@@ -57,6 +59,8 @@ Widget::Widget(QWidget *parent)
 
     connect(mExamView, &ExamView::sendStuProcRequested, this, &Widget::onSendStuProc);
     connect(mExamView, &ExamView::sendStuAnsRequested, this, &Widget::onSendStuAns);
+    connect(mExamView, &ExamView::sendStuFinishRequested, this, &Widget::onSendStuFinish);
+    connect(mExamView, &ExamView::reconnectRequested, this, &Widget::onReconnect);
     connect(mExamView, &ExamView::logout, this, &Widget::onLogout);
 
     udpSendSearchServer();
@@ -78,10 +82,18 @@ bool Widget::parseUdpDatagram(const QByteArray &array) {
 
     QString type = root.attribute("Type");
     if(type == "SearchServerRetval") {
-        QString address = root.attribute("Address");
-        quint16 port = root.attribute("Port").toUShort();
-        QString name = root.text();
-        mLoginView->addServer(address, port, name);
+        if(mStkLayout->currentWidget() == mLoginView) {
+            QString address = root.attribute("Address");
+            quint16 port = root.attribute("Port").toUShort();
+            QString name = root.text();
+            mLoginView->addServer(address, port, name);
+        } else if(mStkLayout->currentWidget() == mExamView) {
+            if(mTcpSocket->state() == QTcpSocket::UnconnectedState) {
+                if(mExamView->examId() == root.attribute("ID")) {
+                    mTcpSocket->connectToHost(QHostAddress(root.attribute("Address")), root.attribute("Port").toUShort());
+                }
+            }
+        }
     } else if(type == "VerifyErr") {
         mLoginView->setViewEnabled(true);
         QMessageBox::critical(this, "连接错误", root.text());
@@ -105,6 +117,7 @@ bool Widget::parseTcpDatagram(const QByteArray &array) {
 
     QString type = root.attribute("Type");
     if(type == "VerifySucc") {
+        mExamView->setSrvState(true);
         if(mStkLayout->currentWidget() == mLoginView) {
             // 设置当前控件
             mExamView->clear();
@@ -138,6 +151,7 @@ bool Widget::parseTcpDatagram(const QByteArray &array) {
             }
 
             // 设置考试信息
+            mExamView->setExamId(root.attribute("ID"));
             mExamView->setExamName(root.attribute("Name"));
 
             // 设置时间显示
@@ -167,6 +181,8 @@ bool Widget::parseTcpDatagram(const QByteArray &array) {
         }
     } else if(type == "StuAnsReceived") {
         mExamView->setLastUploadDateTime(QDateTime::fromString(root.text(), "yyyy/M/d H:m:s"));
+        if(mEventLoopWait.isRunning())
+            mEventLoopWait.quit();
     } else return false;
 
     return true;
@@ -174,6 +190,23 @@ bool Widget::parseTcpDatagram(const QByteArray &array) {
 qint64 Widget::tcpSendDatagram(const QByteArray &array) {
     int len = array.length();
     return mTcpSocket->write(QByteArray((char*)&len, 4) + array);
+}
+
+bool Widget::waitForUpload() {
+    mExamView->setEnabled(false);
+
+    bool flag = true;
+    QObject obj;
+    QTimer::singleShot(3000, &obj, [this, &flag] {
+        mEventLoopWait.quit();
+        QMessageBox::critical(this, "错误", "上传失败");
+        flag = false;
+    });
+    onSendStuAns();
+    mEventLoopWait.exec();
+
+    mExamView->setEnabled(true);
+    return flag;
 }
 
 void Widget::udpSendSearchServer() {
@@ -202,7 +235,6 @@ void Widget::onSendStuProc() {
 }
 void Widget::onSendStuAns() {
     onSendStuProc();
-    //mTcpSocket->flush();
     QByteArray array;
     QXmlStreamWriter xml(&array);
     xml.writeStartDocument();
@@ -214,7 +246,50 @@ void Widget::onSendStuAns() {
     xml.writeEndDocument();
     tcpSendDatagram(array);
 }
+void Widget::onSendStuFinish() {
+    if(!waitForUpload())
+        return;
+    QByteArray array;
+    QXmlStreamWriter xml(&array);
+    xml.writeStartDocument();
+    xml.writeStartElement("ESDtg");
+    xml.writeAttribute("Type", "StuFinish");
+    xml.writeEndElement();
+    xml.writeEndDocument();
+    tcpSendDatagram(array);
+}
+void Widget::onReconnect() {
+    if(mTcpSocket->state() != QTcpSocket::UnconnectedState)
+        return;
+    {
+        QObject obj;
+        QEventLoop evLoop;
+        bool flag = true;
+        QTimer::singleShot(3000, &obj, [&evLoop, &flag] {
+            evLoop.quit();
+            flag = false;
+        });
+        connect(mTcpSocket, &QTcpSocket::connected, &obj, [&evLoop] {
+            evLoop.quit();
+        });
+
+        mExamView->setEnabled(false);
+        udpSendSearchServer();
+        evLoop.exec();
+        mExamView->setEnabled(true);
+
+        if(!flag) {
+            QMessageBox::critical(this, "错误", "重连失败");
+            return;
+        }
+    }
+}
 void Widget::onLogout() {
+    if(!waitForUpload()) {
+        int ret = QMessageBox::information(this, "提示", "是否忽略错误，继续登出?", "是", "否");
+        if(ret == 1)
+            return;
+    }
     mTcpSocket->disconnectFromHost();
     udpSendSearchServer();
     mLoginView->clearStuInfo();
@@ -266,6 +341,7 @@ void Widget::onTcpConnected() {
 }
 void Widget::onTcpDisconnected() {
     mLoginView->setViewEnabled(true);
+    mExamView->setSrvState(false);
 }
 void Widget::onTcpReadyRead() {
     mTcpBuffer += mTcpSocket->readAll();
@@ -287,4 +363,21 @@ void Widget::onTcpError(QAbstractSocket::SocketError err) {
         return;
     mLoginView->setViewEnabled(true);
     QMessageBox::critical(this, "连接错误", QMetaEnum::fromType<QAbstractSocket::SocketError>().valueToKey(err));
+}
+
+void Widget::closeEvent(QCloseEvent *ev) {
+    if(mStkLayout->currentWidget() != mExamView)
+        return;
+
+    int ret = QMessageBox::information(this, "提示", "确认要关闭界面吗?\n作答将会自动上传", "确定", "取消");
+    if(ret == 1) {
+        ev->ignore();
+        return;
+    }
+
+    if(waitForUpload())
+        return;
+    ret = QMessageBox::information(this, "提示", "是否忽略错误，继续关闭?", "是", "否");
+    if(ret == 1)
+        ev->ignore();
 }

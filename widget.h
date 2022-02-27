@@ -3,6 +3,7 @@
 #include <QWidget>
 
 #include <QHostAddress>
+#include <QEventLoop>
 
 class QUdpSocket;
 class QTcpSocket;
@@ -26,9 +27,13 @@ public:
     bool parseTcpDatagram(const QByteArray &array);
     qint64 tcpSendDatagram(const QByteArray &array);
 
+    bool waitForUpload();
+
 public slots:
     void onSendStuProc();
     void onSendStuAns();
+    void onSendStuFinish();
+    void onReconnect();
     void onLogout();
 
     void udpSendSearchServer();
@@ -42,6 +47,9 @@ public slots:
     void onTcpReadyRead();
     void onTcpError(QAbstractSocket::SocketError err);
 
+protected:
+    void closeEvent(QCloseEvent *ev) override;
+
 private:
     QUdpSocket *mUdpSocket;
     QTcpSocket *mTcpSocket;
@@ -53,4 +61,7 @@ private:
 
     QHostAddress mMulticastAddress;
     QByteArray mTcpBuffer;
+
+    // 用于等待作答上传完成
+    QEventLoop mEventLoopWait;
 };

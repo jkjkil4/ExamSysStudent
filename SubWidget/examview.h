@@ -27,6 +27,9 @@ public:
     void setEndDateTime(const QDateTime &dt);
     void setCurDateTime(const QDateTime &dt);
     QDateTime curDateTime() { return mDateTimeCur; }
+    void setSrvState(bool isConnected);
+    void setExamId(const QString &id) { mExamId = id; }
+    QString examId() { return mExamId; }
 
     void setStuName(const QString &stuName);
 
@@ -64,6 +67,8 @@ public:
 signals:
     void sendStuProcRequested();
     void sendStuAnsRequested();
+    void sendStuFinishRequested();
+    void reconnectRequested();
     void logout();
 
 public slots:
@@ -77,6 +82,7 @@ private:
     Ui::ExamView *ui;
 
     QVBoxLayout *mLayoutExam, *mLayoutQues;
+    QString mExamId;
 
     // 定时器，用于更新时间
     QTimer *mTimeTimer;

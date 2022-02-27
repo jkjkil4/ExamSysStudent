@@ -83,7 +83,7 @@ QPushButton:pressed{
 	background-color: rgb(17,171,164);
 }</string>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,1,0,0">
+      <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,1,0,0,0">
        <item>
         <widget class="QGroupBox" name="boxExamInfo">
          <property name="title">
@@ -210,6 +210,27 @@ QPushButton:pressed{
             </item>
            </layout>
           </item>
+          <item>
+           <layout class="QHBoxLayout" name="layoutSrvStat" stretch="0,1">
+            <item>
+             <widget class="QLabel" name="labelSrvStatText">
+              <property name="text">
+               <string>连接状态:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="labelSrvStat">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
          </layout>
         </widget>
        </item>
@@ -308,7 +329,7 @@ QPushButton:pressed{
           <item>
            <widget class="QPushButton" name="btnUpload">
             <property name="text">
-             <string>上传试卷</string>
+             <string>上传作答</string>
             </property>
            </widget>
           </item>
@@ -363,6 +384,13 @@ QPushButton:pressed{
           </size>
          </property>
         </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnReconnect">
+         <property name="text">
+          <string>重新连接</string>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QPushButton" name="btnExit">
