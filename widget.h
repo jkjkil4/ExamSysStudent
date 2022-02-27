@@ -27,7 +27,7 @@ public:
     qint64 tcpSendDatagram(const QByteArray &array);
 
 public slots:
-    void onSendStuProc(int proc);
+    void onSendStuProc();
     void onSendStuAns();
     void onLogout();
 

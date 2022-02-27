@@ -166,7 +166,7 @@ bool Widget::parseTcpDatagram(const QByteArray &array) {
             }
         }
     } else if(type == "StuAnsReceived") {
-        mExamView->setLastUploadDateTime(QDateTime::fromString(root.text(), "yyyy/M/d HH:mm:ss"));
+        mExamView->setLastUploadDateTime(QDateTime::fromString(root.text(), "yyyy/M/d H:m:s"));
     } else return false;
 
     return true;
@@ -189,18 +189,20 @@ void Widget::udpSendSearchServer() {
     mUdpSocket->writeDatagram(array, QHostAddress::Broadcast, 40565);
 }
 
-void Widget::onSendStuProc(int proc) {
+void Widget::onSendStuProc() {
     QByteArray array;
     QXmlStreamWriter xml(&array);
     xml.writeStartDocument();
     xml.writeStartElement("ESDtg");
     xml.writeAttribute("Type", "AnsProc");
-    xml.writeCharacters(QString::number(proc));
+    xml.writeCharacters(QString::number(mExamView->proc()));
     xml.writeEndElement();
     xml.writeEndDocument();
     tcpSendDatagram(array);
 }
 void Widget::onSendStuAns() {
+    onSendStuProc();
+    //mTcpSocket->flush();
     QByteArray array;
     QXmlStreamWriter xml(&array);
     xml.writeStartDocument();
@@ -274,6 +276,10 @@ void Widget::onTcpReadyRead() {
     while(mTcpBuffer.length() >= 4 + len) {
         parseTcpDatagram(mTcpBuffer.mid(4, len));
         mTcpBuffer.remove(0, 4 + len);
+
+        if(mTcpBuffer.length() < 4)
+            break;
+        len = *reinterpret_cast<int*>(mTcpBuffer.data());
     }
 }
 void Widget::onTcpError(QAbstractSocket::SocketError err) {

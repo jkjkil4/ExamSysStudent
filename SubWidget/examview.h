@@ -59,9 +59,10 @@ public:
     void setVisible(bool visible) override;
 
     bool checkIsDone();
+    int proc();
 
 signals:
-    void sendStuProcRequested(int proc);
+    void sendStuProcRequested();
     void sendStuAnsRequested();
     void logout();
 
