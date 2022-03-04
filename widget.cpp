@@ -2,6 +2,9 @@
 
 #include <QStackedLayout>
 #include <QMessageBox>
+#include <QPushButton>
+#include <QLabel>
+#include <QScrollArea>
 
 #include <QXmlStreamWriter>
 #include <QDomElement>
@@ -250,6 +253,51 @@ void Widget::onSendStuAns() {
     tcpSendDatagram(array);
 }
 void Widget::onSendStuFinish() {
+    QScrollArea *widget = mExamView->newCheckWidget();
+    if(widget) {
+        QLabel *label = new QLabel("以下题目未完成，确认提交吗?");
+
+        QPushButton *btnAccept = new QPushButton("确定");
+        QPushButton *btnCancel = new QPushButton("取消");
+        QHBoxLayout *layoutButtons = new QHBoxLayout;
+        layoutButtons->addStretch(2);
+        layoutButtons->addWidget(btnAccept, 1);
+        layoutButtons->addStretch(1);
+        layoutButtons->addWidget(btnCancel, 1);
+        layoutButtons->addStretch(2);
+
+        QVBoxLayout *layoutMain = new QVBoxLayout;
+        layoutMain->addWidget(label, 0, Qt::AlignLeft);
+        layoutMain->addWidget(widget, 1);
+        layoutMain->addLayout(layoutButtons);
+
+        QDialog dialog;
+        dialog.setWindowTitle("提示");
+        dialog.setLayout(layoutMain);
+        dialog.setStyleSheet("QDialog{"
+                             "    background-color: white;"
+                             "}"
+                             "QPushButton{"
+                             "    color: #FFFFFF;"
+                             "    border: 2px solid rgb(24, 204, 192);"
+                             "    background-color: rgb(20,196,188);"
+                             "}"
+                             "QPushButton:hover{"
+                             "    background-color: rgb(22,218,208);"
+                             "}"
+                             "QPushButton:pressed{"
+                             "    background-color: rgb(17,171,164);"
+                             "}");
+        connect(btnAccept, &QPushButton::clicked, &dialog, &QDialog::accept);
+        connect(btnCancel, &QPushButton::clicked, &dialog, &QDialog::reject);
+        if(!dialog.exec())
+            return;
+    } else {
+        int ret = QMessageBox::information(this, "提示", "确认提交吗?", "确认", "取消");
+        if(ret == 1)
+            return;
+    }
+
     if(!waitForUpload())
         return;
 
@@ -276,7 +324,6 @@ void Widget::onSendStuFinish() {
         mExamView->setEnabled(true);
         if(!flag) {
             QMessageBox::critical(this, "错误", "提交失败");
-//            return;
         }
     }
 }

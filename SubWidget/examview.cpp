@@ -140,7 +140,7 @@ void ExamView::setVisible(bool visible) {
     QWidget::setVisible(visible);
 }
 
-bool ExamView::checkIsDone() {
+QScrollArea* ExamView::newCheckWidget() {
     struct Unfinished { int ind; QString what; };
 
     // 遍历题目检查是否有未完成的题目
@@ -155,7 +155,7 @@ bool ExamView::checkIsDone() {
 
     // 如果没有未完成的题目，则退出函数
     if(listUnfinished.isEmpty())
-        return true;
+        return nullptr;
 
     // 创建控件并显示
     QVBoxLayout *layoutArea = new QVBoxLayout;
@@ -188,17 +188,7 @@ bool ExamView::checkIsDone() {
     areaWidget->setLayout(layoutArea);
     area->setWidget(areaWidget);
 
-    QHBoxLayout *layoutDialog = new QHBoxLayout;
-    layoutDialog->setMargin(0);
-    layoutDialog->addWidget(area);
-
-    QDialog dialog(this);
-    dialog.setWindowTitle("以下题目未完成");
-    dialog.setLayout(layoutDialog);
-    dialog.resize(300, 400);
-    dialog.exec();
-
-    return false;
+    return area;
 }
 
 int ExamView::proc() {
@@ -227,14 +217,26 @@ void ExamView::onBtnStartClicked() {
     ui->btnStart->setEnabled(false);
 }
 void ExamView::onBtnCheckClicked() {
-    if(checkIsDone())
+    QScrollArea *widget = newCheckWidget();
+    if(!widget) {
         QMessageBox::information(this, "提示", "所有题目已完成");
+        return;
+    }
+
+    QHBoxLayout *layoutDialog = new QHBoxLayout;
+    layoutDialog->setMargin(0);
+    layoutDialog->addWidget(widget);
+
+    QDialog dialog(this);
+    dialog.setWindowTitle("以下题目未完成");
+    dialog.setLayout(layoutDialog);
+    dialog.resize(300, 400);
+    dialog.exec();
 }
 void ExamView::onBtnExitClicked() {
     int ret = QMessageBox::information(this, "提示", "确认登出吗?", "确定", "取消");
     if(ret != 0)
         return;
-    // uploadStuAns();
     emit logout();
 }
 

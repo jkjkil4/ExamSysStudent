@@ -6,6 +6,7 @@
 #include <QMap>
 
 class QLabel;
+class QScrollArea;
 class QVBoxLayout;
 class QTimer;
 class QDomElement;
@@ -61,7 +62,7 @@ public:
 
     void setVisible(bool visible) override;
 
-    bool checkIsDone();
+    QScrollArea *newCheckWidget();
     int proc();
 
 signals:
