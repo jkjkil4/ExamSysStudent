@@ -63,5 +63,7 @@ private:
     QByteArray mTcpBuffer;
 
     // 用于等待作答上传完成
-    QEventLoop mEventLoopWait;
+    QEventLoop mEventLoopWaitUpload;
+    // 用于等待提交完成
+    QEventLoop mEventLoopWaitFinish;
 };

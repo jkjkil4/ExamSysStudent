@@ -8,6 +8,8 @@ QT       += core gui xml network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
+# QMAKE_LFLAGS += -static -static-libgcc -static-libstdc++
+
 TARGET = ExamSysStudent
 TEMPLATE = app
 

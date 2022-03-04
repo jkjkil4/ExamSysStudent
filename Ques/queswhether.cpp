@@ -38,7 +38,7 @@ void QuesWhether::readXml(const QDomElement &elem) {
     mLabelQues->setText(elem.text());
 }
 void QuesWhether::writeXmlStuAns(QXmlStreamWriter &xml) const {
-    xml.writeTextElement("QuesWhether", QString::number(mButton->state()));
+    xml.writeTextElement("v", QString::number(mButton->state()));
 }
 void QuesWhether::readXmlStuAns(const QDomElement &elem) {
     mButton->setState((DoubleSlideButton::State)elem.text().toInt());

@@ -15,6 +15,6 @@ QuesInvalid::QuesInvalid(const QString &quesName, QWidget *parent)
 }
 
 void QuesInvalid::writeXmlStuAns(QXmlStreamWriter &xml) const {
-    xml.writeStartElement(mQuesName);
+    xml.writeStartElement("v");
     xml.writeEndElement();
 }

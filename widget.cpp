@@ -181,8 +181,11 @@ bool Widget::parseTcpDatagram(const QByteArray &array) {
         }
     } else if(type == "StuAnsReceived") {
         mExamView->setLastUploadDateTime(QDateTime::fromString(root.text(), "yyyy/M/d H:m:s"));
-        if(mEventLoopWait.isRunning())
-            mEventLoopWait.quit();
+        if(mEventLoopWaitUpload.isRunning())
+            mEventLoopWaitUpload.quit();
+    } else if(type == "StuFinishRetval") {
+        if(mEventLoopWaitFinish.isRunning())
+            mEventLoopWaitFinish.quit();
     } else return false;
 
     return true;
@@ -198,12 +201,12 @@ bool Widget::waitForUpload() {
     bool flag = true;
     QObject obj;
     QTimer::singleShot(3000, &obj, [this, &flag] {
-        mEventLoopWait.quit();
+        mEventLoopWaitUpload.quit();
         QMessageBox::critical(this, "错误", "上传失败");
         flag = false;
     });
     onSendStuAns();
-    mEventLoopWait.exec();
+    mEventLoopWaitUpload.exec();
 
     mExamView->setEnabled(true);
     return flag;
@@ -249,6 +252,7 @@ void Widget::onSendStuAns() {
 void Widget::onSendStuFinish() {
     if(!waitForUpload())
         return;
+
     QByteArray array;
     QXmlStreamWriter xml(&array);
     xml.writeStartDocument();
@@ -256,7 +260,25 @@ void Widget::onSendStuFinish() {
     xml.writeAttribute("Type", "StuFinish");
     xml.writeEndElement();
     xml.writeEndDocument();
-    tcpSendDatagram(array);
+
+    {
+        mExamView->setEnabled(false);
+
+        bool flag = true;
+        QObject obj;
+        QTimer::singleShot(3000, &obj, [this, &flag] {
+            mEventLoopWaitFinish.quit();
+            flag = false;
+        });
+        tcpSendDatagram(array);
+        mEventLoopWaitFinish.exec();
+
+        mExamView->setEnabled(true);
+        if(!flag) {
+            QMessageBox::critical(this, "错误", "提交失败");
+//            return;
+        }
+    }
 }
 void Widget::onReconnect() {
     if(mTcpSocket->state() != QTcpSocket::UnconnectedState)

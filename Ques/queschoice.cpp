@@ -57,7 +57,7 @@ void QuesChoice::writeXmlStuAns(QXmlStreamWriter &xml) const {
             ansStr += QString::number(i) + ';';
     }
 
-    xml.writeTextElement(mQuesName, ansStr);
+    xml.writeTextElement("v", ansStr);
 }
 
 void QuesChoice::readXmlStuAns(const QDomElement &elem) {
