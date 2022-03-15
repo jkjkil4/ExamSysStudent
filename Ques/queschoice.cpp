@@ -69,7 +69,11 @@ void QuesChoice::readXmlStuAns(const QDomElement &elem) {
     }
 
     // 读取选中状态
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    QStringList ansList = elem.text().split(';', Qt::SkipEmptyParts);
+#else
     QStringList ansList = elem.text().split(';', QString::SkipEmptyParts);
+#endif
     for(const QString &ans : ansList) {
         int ind = ans.toInt();
         if(ind >= 0 && ind < count) {
@@ -82,7 +86,7 @@ void QuesChoice::readXmlStuAns(const QDomElement &elem) {
 QString QuesChoice::numToLetter(int num) {
     QString res;
     do {
-        res += 'A' + num % 26;
+        res += (char)('A' + num % 26);
         num /= 26;
     } while(num);
     return res;

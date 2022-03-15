@@ -11,6 +11,7 @@ LoginView::LoginView(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->btnFlush->setIcon(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_BrowserReload));
+
     connect(ui->btnFlush, SIGNAL(clicked()), this, SIGNAL(flushServer()));
     connect(ui->btnConnect, SIGNAL(clicked()), this, SIGNAL(connectServer()));
     connect(ui->btnAbout, &QPushButton::clicked, this, &LoginView::onBtnAboutClicked);

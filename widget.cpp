@@ -32,10 +32,10 @@ Widget::Widget(QWidget *parent)
     mStkLayout->addWidget(mLoginView);
     mStkLayout->addWidget(mExamView);
     mStkLayout->setCurrentWidget(mLoginView);
-    mStkLayout->setMargin(0);
+    mStkLayout->setContentsMargins(QMargins());
     setLayout(mStkLayout);
     setWindowTitle("考试系统（考生端）");
-    resize(1240, 760);
+    resize(1050, 650);
 
     // 获取本机IP
     QList<QHostAddress> addresses = QNetworkInterface::allAddresses();
@@ -55,7 +55,11 @@ Widget::Widget(QWidget *parent)
     connect(mTcpSocket, &QTcpSocket::connected, this, &Widget::onTcpConnected);
     connect(mTcpSocket, &QTcpSocket::disconnected, this, &Widget::onTcpDisconnected);
     connect(mTcpSocket, &QTcpSocket::readyRead, this, &Widget::onTcpReadyRead);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    connect(mTcpSocket, QOverload<QAbstractSocket::SocketError>::of(&QTcpSocket::errorOccurred), this, &Widget::onTcpError);
+#else
     connect(mTcpSocket, QOverload<QAbstractSocket::SocketError>::of(&QTcpSocket::error), this, &Widget::onTcpError);
+#endif
 
     connect(mLoginView, &LoginView::flushServer, this, &Widget::udpSendSearchServer);
     connect(mLoginView, &LoginView::connectServer, this, &Widget::onConnectServer);
@@ -288,6 +292,7 @@ void Widget::onSendStuFinish() {
                              "QPushButton:pressed{"
                              "    background-color: rgb(17,171,164);"
                              "}");
+        dialog.resize(300, 400);
         connect(btnAccept, &QPushButton::clicked, &dialog, &QDialog::accept);
         connect(btnCancel, &QPushButton::clicked, &dialog, &QDialog::reject);
         if(!dialog.exec())

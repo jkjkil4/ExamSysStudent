@@ -224,7 +224,7 @@ void ExamView::onBtnCheckClicked() {
     }
 
     QHBoxLayout *layoutDialog = new QHBoxLayout;
-    layoutDialog->setMargin(0);
+    layoutDialog->setContentsMargins(QMargins());
     layoutDialog->addWidget(widget);
 
     QDialog dialog(this);
