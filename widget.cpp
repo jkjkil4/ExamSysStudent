@@ -22,6 +22,8 @@
 #include "SubWidget/loginview.h"
 #include "SubWidget/examview.h"
 
+#include "Widget/scorewidget.h"
+
 Widget::Widget(QWidget *parent)
     : QWidget(parent),
       mUdpSocket(new QUdpSocket(this)), mTcpSocket(new QTcpSocket(this)),
@@ -191,6 +193,21 @@ bool Widget::parseTcpDatagram(const QByteArray &array) {
         if(mEventLoopWaitUpload.isRunning())
             mEventLoopWaitUpload.quit();
     } else if(type == "StuFinishRetval") {
+        QDomElement elemScore;
+        QDomNode node = root.firstChild();
+        while(!node.isNull()) {
+            QDomElement elem = node.toElement();
+            if(!elem.isNull() && elem.tagName() == "ScoreList")
+                elemScore = elem;
+            node = root.nextSibling();
+        }
+        if(!elemScore.isNull()) {
+            ScoreWidget *widget = new ScoreWidget(elemScore);
+            widget->setWindowTitle("作答情况");
+            widget->setAttribute(Qt::WA_DeleteOnClose);
+            widget->show();
+        }
+
         if(mEventLoopWaitFinish.isRunning())
             mEventLoopWaitFinish.quit();
     } else return false;

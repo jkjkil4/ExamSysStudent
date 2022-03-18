@@ -24,6 +24,7 @@ public:
     ~ExamView() override;
 
     void setExamName(const QString &examName);
+    QString examName();
     void setStartDateTime(const QDateTime &dt);
     void setEndDateTime(const QDateTime &dt);
     void setCurDateTime(const QDateTime &dt);

@@ -36,6 +36,7 @@ SOURCES += \
         SubWidget/examview.cpp \
         SubWidget/loginview.cpp \
         Widget/doubleslidebutton.cpp \
+        Widget/scorewidget.cpp \
         main.cpp \
         widget.cpp
 
@@ -49,6 +50,7 @@ HEADERS += \
         SubWidget/examview.h \
         SubWidget/loginview.h \
         Widget/doubleslidebutton.h \
+        Widget/scorewidget.h \
         widget.h
 
 # Default rules for deployment.

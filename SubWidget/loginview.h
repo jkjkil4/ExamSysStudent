@@ -22,7 +22,7 @@ public:
     };
 
     explicit LoginView(QWidget *parent = nullptr);
-    ~LoginView();
+    ~LoginView() override;
 
     /**
      * @brief   设置界面是否可用

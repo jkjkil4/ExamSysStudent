@@ -48,6 +48,7 @@ ExamView::~ExamView()
 }
 
 void ExamView::setExamName(const QString &examName) { ui->labelExamName->setText(examName); }
+QString ExamView::examName() { return ui->labelExamName->text(); }
 void ExamView::setStartDateTime(const QDateTime &dt) { setDateTime(mDateTimeStart, ui->labelStartTime, dt); }
 void ExamView::setEndDateTime(const QDateTime &dt) { setDateTime(mDateTimeEnd, ui->labelEndTime, dt); }
 void ExamView::setCurDateTime(const QDateTime &dt) { setDateTime(mDateTimeCur, ui->labelCurTime, dt); }
