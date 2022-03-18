@@ -35,7 +35,7 @@ bool QuesWhether::isDone(QString *pStr) const {
 void QuesWhether::readXml(const QDomElement &elem) {
     mLabelBtnLeft->setText(elem.attribute("LTxt"));
     mLabelBtnRight->setText(elem.attribute("RTxt"));
-    mLabelQues->setText(elem.text());
+    mLabelQues->setText("（判断题）" + elem.text());
 }
 void QuesWhether::writeXmlStuAns(QXmlStreamWriter &xml) const {
     xml.writeTextElement("v", QString::number(mButton->state()));

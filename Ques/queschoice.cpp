@@ -29,7 +29,7 @@ void QuesChoice::readXml(const QDomElement &elem) {
     }
 
     // 题目
-    mLabelQues->setText(elem.attribute("Ques"));
+    mLabelQues->setText(mHead + elem.attribute("Ques"));
 
     // 选项
     QDomNode node = elem.firstChild();
