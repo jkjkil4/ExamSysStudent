@@ -94,6 +94,7 @@ ScoreWidget::ScoreWidget(const QDomElement &elem, QWidget *parent)
     layoutMain->addWidget(mScrollArea);
     setLayout(layoutMain);
     resize(1050, 650);
+    setWindowTitle("作答情况");
 }
 
 int ScoreWidget::currentInd(bool ignoreTop) {

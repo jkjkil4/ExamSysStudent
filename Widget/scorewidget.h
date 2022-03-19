@@ -27,7 +27,7 @@ public slots:
     void onNextWrong();
 
 protected:
-    void closeEvent(QCloseEvent *ev);
+    void closeEvent(QCloseEvent *ev) override;
 
 private:
     QToolBar *mToolBar;

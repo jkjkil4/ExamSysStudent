@@ -28,8 +28,7 @@ Widget::Widget(QWidget *parent)
     : QWidget(parent),
       mUdpSocket(new QUdpSocket(this)), mTcpSocket(new QTcpSocket(this)),
       mStkLayout(new QStackedLayout),
-      mLoginView(new LoginView(this)), mExamView(new ExamView(this)),
-      mMulticastAddress("239.255.43.21")
+      mLoginView(new LoginView(this)), mExamView(new ExamView(this))
 {
     mStkLayout->addWidget(mLoginView);
     mStkLayout->addWidget(mExamView);
@@ -40,18 +39,7 @@ Widget::Widget(QWidget *parent)
     resize(1050, 650);
 
     // 获取本机IP
-    QList<QHostAddress> addresses = QNetworkInterface::allAddresses();
-    for(const QHostAddress &address : qAsConst(addresses)) {
-        if(address != QHostAddress::LocalHost && address.toIPv4Address()) {
-            mAddress = address;
-            break;
-        }
-    }
-    if(mAddress.isNull())
-        mAddress = QHostAddress::LocalHost;
-
-    mUdpSocket->bind(mAddress, 40565, QUdpSocket::ShareAddress);
-    mUdpSocket->joinMulticastGroup(mMulticastAddress);
+    resetSockets();
 
     connect(mUdpSocket, &QUdpSocket::readyRead, this, &Widget::onUdpReadyRead);
     connect(mTcpSocket, &QTcpSocket::connected, this, &Widget::onTcpConnected);
@@ -81,6 +69,23 @@ Widget::~Widget()
         mTcpSocket->disconnectFromHost();
 }
 
+void Widget::resetSockets() {
+    mUdpSocket->abort();
+
+    mAddress = QHostAddress();
+    QList<QHostAddress> addresses = QNetworkInterface::allAddresses();
+    for(const QHostAddress &address : qAsConst(addresses)) {
+        if(address != QHostAddress::LocalHost && address.toIPv4Address()) {
+            mAddress = address;
+            break;
+        }
+    }
+    if(mAddress.isNull())
+        mAddress = QHostAddress::LocalHost;
+
+    mUdpSocket->bind(mAddress, 40565, QUdpSocket::ShareAddress);
+}
+
 bool Widget::parseUdpDatagram(const QByteArray &array) {
     QDomDocument doc;
     if(!doc.setContent(array))
@@ -106,12 +111,6 @@ bool Widget::parseUdpDatagram(const QByteArray &array) {
     } else if(type == "VerifyErr") {
         mLoginView->setViewEnabled(true);
         QMessageBox::critical(this, "连接错误", root.text());
-    } else if(type == "UpdTime") {
-        if(QHostAddress(root.attribute("Address")) == mTcpSocket->peerAddress() && root.attribute("Port").toUShort() == mTcpSocket->peerPort()) {
-            QDateTime dateTime = QDateTime::fromString(root.text(), "yyyy/M/d H:m:s");
-            if(dateTime.isValid())
-                mExamView->setCurDateTime(dateTime);
-        }
     } else return false;
 
     return true;
@@ -142,6 +141,10 @@ bool Widget::parseTcpDatagram(const QByteArray &array) {
             xml.writeEndDocument();
             tcpSendDatagram(array);
         }
+    } else if(type == "UpdTime") {
+        QDateTime dateTime = QDateTime::fromString(root.text(), "yyyy/M/d H:m:s");
+        if(dateTime.isValid())
+            mExamView->setCurDateTime(dateTime);
     } else if(type == "ExamData") {
         if(mStkLayout->currentWidget() == mExamView) {
             QDomElement elemQuesList;
@@ -203,7 +206,6 @@ bool Widget::parseTcpDatagram(const QByteArray &array) {
         }
         if(!elemScore.isNull()) {
             ScoreWidget *widget = new ScoreWidget(elemScore);
-            widget->setWindowTitle("作答情况");
             widget->setAttribute(Qt::WA_DeleteOnClose);
             widget->show();
         }
@@ -242,6 +244,8 @@ bool Widget::waitForUpload() {
 }
 
 void Widget::udpSendSearchServer() {
+    resetSockets();
+
     QByteArray array;
     QXmlStreamWriter xml(&array);
     xml.writeStartDocument();

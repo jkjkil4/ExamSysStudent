@@ -23,6 +23,8 @@ public:
     Widget(QWidget *parent = nullptr);
     ~Widget() override;
 
+    void resetSockets();
+
     bool parseUdpDatagram(const QByteArray &array);
     bool parseTcpDatagram(const QByteArray &array);
     qint64 tcpSendDatagram(const QByteArray &array);
@@ -59,7 +61,6 @@ private:
     LoginView *mLoginView;
     ExamView *mExamView;
 
-    QHostAddress mMulticastAddress;
     QByteArray mTcpBuffer;
 
     // 用于等待作答上传完成
