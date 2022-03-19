@@ -13,6 +13,12 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = ExamSysStudent
 TEMPLATE = app
 
+RC_ICONS += ExamSysStudent.ico
+RC_LANG = 0x0004
+VERSION = 0.1.0
+QMAKE_TARGET_DESCRIPTION = "ExamSysStudent"
+QMAKE_TARGET_COPYRIGHT = "jkjkil4"
+
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
