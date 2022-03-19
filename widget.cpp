@@ -210,6 +210,11 @@ bool Widget::parseTcpDatagram(const QByteArray &array) {
 
         if(mEventLoopWaitFinish.isRunning())
             mEventLoopWaitFinish.quit();
+
+        mTcpSocket->disconnectFromHost();
+        udpSendSearchServer();
+        mLoginView->clearStuInfo();
+        mStkLayout->setCurrentWidget(mLoginView);
     } else return false;
 
     return true;
