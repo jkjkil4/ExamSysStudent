@@ -217,6 +217,13 @@ bool Widget::parseTcpDatagram(const QByteArray &array) {
         udpSendSearchServer();
         mLoginView->clearStuInfo();
         mStkLayout->setCurrentWidget(mLoginView);
+    } else if(type == "SrvClosed") {
+        if(mStkLayout->currentWidget() == mExamView) {
+            mTcpSocket->disconnectFromHost();
+            udpSendSearchServer();
+            mLoginView->clearStuInfo();
+            mStkLayout->setCurrentWidget(mLoginView);
+        }
     } else return false;
 
     return true;
