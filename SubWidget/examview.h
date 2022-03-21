@@ -33,6 +33,8 @@ public:
     void setExamId(const QString &id) { mExamId = id; }
     QString examId() { return mExamId; }
 
+    bool isEnd() { return mDateTimeCur >= mDateTimeEnd; }
+
     void setStuName(const QString &stuName);
 
     void setLastUploadDateTime(const QDateTime &dt);

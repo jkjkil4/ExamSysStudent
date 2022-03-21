@@ -385,7 +385,7 @@ void Widget::onReconnect() {
     }
 }
 void Widget::onLogout() {
-    if(!waitForUpload()) {
+    if(!mExamView->isEnd() && !waitForUpload()) {
         int ret = QMessageBox::information(this, "提示", "是否忽略错误，继续登出?", "是", "否");
         if(ret == 1)
             return;
@@ -466,7 +466,11 @@ void Widget::onTcpError(QAbstractSocket::SocketError err) {
 }
 
 void Widget::closeEvent(QCloseEvent *ev) {
+    // 如果不在考试界面，则可以直接关闭
     if(mStkLayout->currentWidget() != mExamView)
+        return;
+    // 如果考试已结束，也可以直接关闭
+    if(mExamView->isEnd())
         return;
 
     int ret = QMessageBox::information(this, "提示", "确认要关闭界面吗?\n作答将会自动上传", "确定", "取消");

@@ -122,10 +122,11 @@ void ExamView::clear() {
     ui->labelStartTime->clear();
     ui->labelEndTime->clear();
     ui->labelCurTime->clear();
-    ui->labelSrvStat->clear();
+//    ui->labelSrvStat->clear();
     ui->labelStuName->clear();
     clearQues();
     setExamVisible(false);
+    ui->widgetWarning->setVisible(false);
     ui->btnStart->setEnabled(true);
     ui->labelUploadTime->setText("暂无");
 }
@@ -246,6 +247,7 @@ void ExamView::onTimeTimerTimeout() {
         return;
     setDateTime(mDateTimeCur, ui->labelCurTime, mDateTimeCur.addSecs(1));
     if(ui->widgetExam->isVisible()) {
+        ui->widgetWarning->setVisible(mDateTimeCur.addSecs(60 * 5) >= mDateTimeEnd);
         ++timeProcessCounter;
         if(timeProcessCounter >= 10) {
             timeProcessCounter = 0;

@@ -408,6 +408,9 @@ QPushButton:pressed{
 }</string>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_4">
+       <property name="spacing">
+        <number>0</number>
+       </property>
        <property name="leftMargin">
         <number>0</number>
        </property>
@@ -420,6 +423,42 @@ QPushButton:pressed{
        <property name="bottomMargin">
         <number>0</number>
        </property>
+       <item>
+        <widget class="QWidget" name="widgetWarning" native="true">
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(255, 255, 170);</string>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QLabel" name="labelWarningIcon">
+            <property name="pixmap">
+             <pixmap resource="../src.qrc">:/icon/src/Warning.png</pixmap>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="labelWarning">
+            <property name="text">
+             <string>考试将在五分钟内结束，请尽快提交，超时无效</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horSpacerWarning">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
        <item>
         <widget class="QScrollArea" name="widgetExam">
          <property name="styleSheet">
@@ -436,7 +475,7 @@ QPushButton:pressed{
             <x>0</x>
             <y>0</y>
             <width>708</width>
-            <height>670</height>
+            <height>616</height>
            </rect>
           </property>
          </widget>
@@ -448,6 +487,8 @@ QPushButton:pressed{
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../src.qrc"/>
+ </resources>
  <connections/>
 </ui>
