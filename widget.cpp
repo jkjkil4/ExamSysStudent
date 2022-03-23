@@ -83,7 +83,7 @@ void Widget::resetSockets() {
     if(mAddress.isNull())
         mAddress = QHostAddress::LocalHost;
 
-    mUdpSocket->bind(mAddress, 40565, QUdpSocket::ShareAddress);
+//    mUdpSocket->bind(mAddress, 0, QUdpSocket::ShareAddress | QUdpSocket::ReuseAddressHint);
 }
 
 bool Widget::parseUdpDatagram(const QByteArray &array) {
@@ -108,9 +108,6 @@ bool Widget::parseUdpDatagram(const QByteArray &array) {
                 }
             }
         }
-    } else if(type == "VerifyErr") {
-        mLoginView->setViewEnabled(true);
-        QMessageBox::critical(this, "连接错误", root.text());
     } else return false;
 
     return true;
@@ -141,6 +138,9 @@ bool Widget::parseTcpDatagram(const QByteArray &array) {
             xml.writeEndDocument();
             tcpSendDatagram(array);
         }
+    } else if(type == "VerifyErr") {
+        mLoginView->setViewEnabled(true);
+        QMessageBox::critical(this, "连接错误", root.text());
     } else if(type == "UpdTime") {
         QDateTime dateTime = QDateTime::fromString(root.text(), "yyyy/M/d H:m:s");
         if(dateTime.isValid())
@@ -258,7 +258,6 @@ void Widget::udpSendSearchServer() {
     xml.writeStartDocument();
     xml.writeStartElement("ESDtg");
     xml.writeAttribute("Type", "SearchServer");
-    xml.writeCharacters(mAddress.toString());
     xml.writeEndElement();
     xml.writeEndDocument();
     mLoginView->clearServer();
